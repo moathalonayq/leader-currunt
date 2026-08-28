@@ -15,12 +15,12 @@ const { normalizeArabic } = require("../utils/arabicNormalize");
 
 // 6 مجموعات، جميعها ضمن فئة واحدة
 const GROUPS_WITH_CATEGORY = [
-  { name: "أبو زامل",      category: "الأولوية" },
-  { name: "أبو عبدالرحمن", category: "الأولوية" },
-  { name: "أبو جبر",        category: "الأولوية" },
-  { name: "أبو محمد",       category: "الأولوية" },
-  { name: "أبو عبدالله",    category: "الأولوية" },
-  { name: "أبو يوسف",       category: "الأولوية" },
+  { name: "ابو عبدالله المانعي", category: "الأولوية" },
+  { name: "ابو خالد المقرن", category: "الأولوية" },
+  { name: "ابو خالد المهيزع", category: "الأولوية" },
+  { name: "ابو عبدالله المهنا", category: "الأولوية" },
+  { name: "ابو نايف الجريس", category: "الأولوية" },
+  { name: "ابو حمد المقرن", category: "الأولوية" },
 ];
 const GROUP_NAMES = GROUPS_WITH_CATEGORY.map((g) => g.name);
 
