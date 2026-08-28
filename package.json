@@ -1,7 +1,7 @@
 {
-  "name": "qayrawan-club",
+  "name": "promise-reward",
   "version": "1.0.0",
-  "description": "موقع قسم قائد - منصة متابعة الطلاب والبرامج",
+  "description": "منصة نادي الوعد (Promise Reward)",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
