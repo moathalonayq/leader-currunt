@@ -1,51 +1,77 @@
 <%- include('partials/header') %>
 
   <section class="app-section active">
+    
+    <div class="journey-header" style="text-align: center; margin-bottom: 40px;">
+      <h2 class="section-title" style="font-size: 26px; color: var(--navy); margin-bottom: 8px;">رحلة الوعد إلى مكة المكرمة 🕋</h2>
+      <p class="section-desc" style="font-size: 15px; color: #666;">كل نقطة يكتسبها الطالب تقرّبه كيلومتراً واحداً! (الهدف: <%= TARGET_POINTS %> كم)</p>
+    </div>
 
-    <h2 class="section-title">نظرة عامة على قسم قائد</h2>
-    <p class="section-desc">إحصائية شاملة عن قسم قائد وأداء الطلاب في جميع البرامج</p>
+    <!-- Map Container -->
+    <div class="journey-map-wrapper">
+      <div class="journey-track-container">
+        
+        <!-- The Road Line -->
+        <div class="journey-track"></div>
+        
+        <!-- Start City (Riyadh) -->
+        <div class="city-marker start-city">
+          <div class="city-icon">🏙️</div>
+          <div class="city-name">الرياض</div>
+          <div class="city-dist">0 كم</div>
+        </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value"><%= stats.totalStudents %></div>
-        <div class="stat-label">عدد الطلاب</div>
-      </div>
-      <div class="stat-card gold">
-        <div class="stat-value"><%= stats.totalGroups %></div>
-        <div class="stat-label">عدد المجموعات</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value"><%= stats.attendanceRate %></div>
-        <div class="stat-label">عدد الحضور</div>
-      </div>
-      <div class="stat-card knowledge">
-        <div class="stat-value"><%= stats.totalKnowledge %></div>
-        <div class="stat-label">نقاط البرنامج الذاتي</div>
-      </div>
-      <div class="stat-card gold">
-        <div class="stat-value"><%= stats.totalInitiatives %></div>
-        <div class="stat-label">نقاط المبادرات المميزة</div>
+        <!-- End City (Mecca) -->
+        <div class="city-marker end-city">
+          <div class="city-icon">🕋</div>
+          <div class="city-name">مكة المكرمة</div>
+          <div class="city-dist"><%= TARGET_POINTS %> كم</div>
+        </div>
+
+        <!-- Student Pins -->
+        <% 
+          const pointCounts = {};
+          allStudents.forEach((s, i) => { 
+            const points = s.total_points;
+            pointCounts[points] = (pointCounts[points] || 0) + 1;
+            const verticalIdx = pointCounts[points] - 1; // 0, 1, 2...
+            
+            let progress = (points / TARGET_POINTS) * 100;
+            if (progress > 100) progress = 100;
+            if (progress < 0) progress = 0;
+            
+            // To prevent all stacked pins from blocking the road, we stack them vertically.
+            const verticalOffset = verticalIdx * 35; // 35px spacing
+        %>
+          <div class="student-pin tooltip" 
+               style="right: <%= progress %>%; bottom: calc(50% - 15px + <%= verticalOffset %>px);">
+            <%= i + 1 %>
+            <span class="tooltiptext"><%= s.name %> (<%= points %> كم)</span>
+          </div>
+        <% }) %>
       </div>
     </div>
 
-    <!-- =========================================================
-         المتصدرون
-         ========================================================= -->
-    <h3 class="section-title" style="font-size:19px; margin-top:36px;">🏆 المتصدرون</h3>
-    <p class="section-desc">أفضل 10 طلاب حسب إجمالي النقاط</p>
-
+    <!-- Legend Table -->
+    <h3 class="section-title" style="font-size:19px; margin-top:40px;">📍 مواقع الطلاب الحالية</h3>
+    
     <div class="data-table-wrapper">
-      <table class="data-table">
+      <table class="data-table journey-table">
         <thead>
-          <tr><th>#</th><th>الاسم</th><th>المجموعة</th><th>الإجمالي</th></tr>
+          <tr>
+            <th># الخريطة</th>
+            <th>اسم الطالب</th>
+            <th>المجموعة</th>
+            <th>المسافة المقطوعة</th>
+          </tr>
         </thead>
         <tbody>
-          <% topStudents.forEach((s, i) => { %>
-            <tr class="<%= i === 0 ? 'rank-gold-row' : i === 1 ? 'rank-silver-row' : i === 2 ? 'rank-bronze-row' : '' %>">
-              <td><%= i + 1 %></td>
+          <% allStudents.forEach((s, i) => { %>
+            <tr class="<%= s.total_points >= TARGET_POINTS ? 'rank-gold-row' : '' %>">
+              <td><div class="pin-badge"><%= i + 1 %></div></td>
               <td><%= s.name %></td>
               <td><%= s.group_name %></td>
-              <td><strong><%= s.total_points %></strong></td>
+              <td><strong><%= s.total_points %> كم</strong></td>
             </tr>
           <% }) %>
         </tbody>

@@ -9,13 +9,16 @@ const studentModel = require("../models/studentModel");
 async function showHome(req, res, next) {
   try {
     const stats = await statsModel.getHomeStats();
-    const topStudents = await studentModel.getTopStudents(10);
+    // جلب جميع الطلاب (بحد أقصى 100 لضمان جلب الجميع) لتمثيلهم على الخريطة
+    const allStudents = await studentModel.getTopStudents(100);
+    const TARGET_POINTS = 1000;
 
     res.render("home", {
-      pageTitle: "الرئيسية",
+      pageTitle: "رحلة الوعد إلى مكة",
       activeNav: "home",
       stats,
-      topStudents,
+      allStudents,
+      TARGET_POINTS,
     });
   } catch (err) {
     next(err);
