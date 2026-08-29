@@ -45,7 +45,9 @@
         <div class="city-marker end-city">
           <div class="city-icon">🕋</div>
           <div class="city-name">مكة المكرمة</div>
-          <div class="city-dist"><%= TARGET_POINTS %> كم</div>
+          <div class="city-dist">
+            <%= TARGET_POINTS %> كم
+          </div>
         </div>
 
         <!-- Student Pins -->
@@ -67,45 +69,6 @@
             </div>
             <% }) %>
       </div>
-    </div>
-
-    <!-- Legend Table -->
-    <h3 class="section-title" style="font-size:19px; margin-top:40px;">📍 مواقع الطلاب الحالية</h3>
-
-    <div class="data-table-wrapper">
-      <table class="data-table journey-table">
-        <thead>
-          <tr>
-            <th># الخريطة</th>
-            <th>اسم الطالب</th>
-            <th>المجموعة</th>
-            <th>المسافة المقطوعة</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% allStudents.forEach((s, i)=> {
-            const isGoal = s.total_points >= TARGET_POINTS;
-            const rowClass = isGoal ? 'rank-gold-row' : '';
-            const pinClass = i < 5 ? `pin-rank-${i + 1}` : '' ; %>
-              <tr class="<%= rowClass %>">
-                <td>
-                  <div class="pin-badge <%= pinClass %>">
-                    <%= i + 1 %>
-                  </div>
-                </td>
-                <td>
-                  <%= s.name %>
-                </td>
-                <td>
-                  <%= s.group_name %>
-                </td>
-                <td><strong>
-                    <%= s.total_points %> كم
-                  </strong></td>
-              </tr>
-              <% }) %>
-        </tbody>
-      </table>
     </div>
 
   </section>
