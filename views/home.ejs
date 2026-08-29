@@ -11,7 +11,14 @@
 
     <!-- Map Container -->
     <div class="journey-map-wrapper">
-      <div class="journey-track-container">
+      
+      <!-- أزرار التوسيع والتصغير -->
+      <div class="map-controls">
+        <button class="map-btn" onclick="zoomMap(1500)">➕ توسيع الخريطة</button>
+        <button class="map-btn" onclick="zoomMap(-1500)">➖ تصغير</button>
+      </div>
+
+      <div class="journey-track-container" id="mapTrack">
 
         <!-- The Road Line -->
         <div class="journey-track"></div>
@@ -45,32 +52,59 @@
         <div class="city-marker end-city">
           <div class="city-icon">🕋</div>
           <div class="city-name">مكة المكرمة</div>
-          <div class="city-dist">
-            <%= TARGET_POINTS %> كم
-          </div>
+          <div class="city-dist"><%= TARGET_POINTS %> كم</div>
         </div>
 
         <!-- Student Pins -->
-        <% const pointCounts={}; allStudents.forEach((s, i)=> {
-          const points = s.total_points;
-          pointCounts[points] = (pointCounts[points] || 0) + 1;
-          const verticalIdx = pointCounts[points] - 1;
+        <% 
+          const pointCounts = {};
+          allStudents.forEach((s, i) => { 
+            const points = s.total_points;
+            pointCounts[points] = (pointCounts[points] || 0) + 1;
+            const verticalIdx = pointCounts[points] - 1; 
+            
+            let progress = (points / TARGET_POINTS) * 100;
+            if (progress > 100) progress = 100;
+            if (progress < 0) progress = 0; 
+            
+            // ترتيب الطلاب في مجموعات (Cluster) إذا كان لديهم نفس النقاط تماماً
+            const MAX_PER_COLUMN = 3; // أقصى عدد للطلاب فوق بعضهم
+            const row = verticalIdx % MAX_PER_COLUMN;
+            const col = Math.floor(verticalIdx / MAX_PER_COLUMN);
+            
+            const verticalOffset = row * 34; // مسافة عمودية 34 بيكسل
+            
+            // إزاحة أفقية لتكوين صفوف بجانب بعضها لمنع صعودهم عالياً جداً
+            let horizontalOffset = 0;
+            if (col > 0) {
+              const dir = col % 2 === 0 ? 1 : -1; // يمين ويسار بالتبادل
+              const step = Math.ceil(col / 2);
+              horizontalOffset = dir * step * 32; // مسافة أفقية 32 بيكسل
+            }
 
-          let progress = (points / TARGET_POINTS) * 100;
-          if (progress > 100) progress = 100;
-          if (progress < 0) progress=0; const verticalOffset=verticalIdx * 35; const rankClass=i < 5 ? `pin-rank-${i +
-            1}` : '' ; %>
-            <div class="student-pin tooltip <%= rankClass %>"
-              style="right: <%= progress %>%; bottom: calc(50% - 15px + <%= verticalOffset %>px);">
-              <%= i + 1 %>
-                <span class="tooltiptext">
-                  <%= s.name %> (<%= points %> كم)
-                </span>
-            </div>
-            <% }) %>
+            const rankClass = i < 5 ? `pin-rank-${i + 1}` : ''; 
+        %>
+          <div class="student-pin tooltip <%= rankClass %>" 
+               style="right: calc(<%= progress %>% + <%= horizontalOffset %>px); bottom: calc(50% - 15px + <%= verticalOffset %>px);">
+            <%= i + 1 %>
+            <span class="tooltiptext"><%= s.name %> (<%= points %> كم)</span>
+          </div>
+        <% }) %>
       </div>
     </div>
 
   </section>
 
   <%- include('partials/footer') %>
+<script>
+  let currentMapWidth = 4000;
+  function zoomMap(amount) {
+    const track = document.getElementById("mapTrack");
+    if (!track) return;
+    currentMapWidth += amount;
+    if (currentMapWidth < 1500) currentMapWidth = 1500; // Minimum width
+    if (currentMapWidth > 15000) currentMapWidth = 15000; // Maximum width
+    track.style.minWidth = currentMapWidth + "px";
+  }
+</script>
+

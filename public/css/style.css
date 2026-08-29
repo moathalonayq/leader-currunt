@@ -2684,17 +2684,19 @@ select {
    ========================================================= */
 
 .journey-map-wrapper {
-  background-color: #E8D3A8; /* التراب / الصحراء */
-  background-image: 
+  background-color: #E8D3A8;
+  /* التراب / الصحراء */
+  background-image:
     radial-gradient(#d5bc87 1px, transparent 1px),
     radial-gradient(#d5bc87 1px, transparent 1px);
   background-size: 20px 20px;
   background-position: 0 0, 10px 10px;
   border-radius: var(--radius-lg);
-  padding: 180px 20px; /* زدت الارتفاع ليملأ الشاشة أكثر */
+  padding: 180px 20px;
+  /* زدت الارتفاع ليملأ الشاشة أكثر */
   min-height: 500px;
   margin: 30px 0;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
   border: 3px solid #d5bc87;
   overflow-x: auto;
   position: relative;
@@ -2702,8 +2704,10 @@ select {
 
 .journey-track-container {
   position: relative;
-  min-width: 4000px; /* Expand massively to ensure space */
-  height: 120px; /* Give vertical space */
+  min-width: 4000px;
+  /* Expand massively to ensure space */
+  height: 120px;
+  /* Give vertical space */
   margin: 0 auto;
 }
 
@@ -2719,7 +2723,7 @@ select {
   border-bottom: 2px solid #222;
   border-radius: 4px;
   transform: translateY(-50%);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .journey-track::after {
@@ -2744,7 +2748,7 @@ select {
   padding: 8px 12px;
   border-radius: 8px;
   border: 2px solid var(--navy);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .start-city {
@@ -2919,13 +2923,15 @@ select {
 
 .station-icon {
   font-size: 24px;
-  margin-bottom: 25px; /* Push it above the road */
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+  margin-bottom: 25px;
+  /* Push it above the road */
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
 }
 
 .station-dist {
   position: absolute;
-  top: 60px; /* Push distance label below the road */
+  top: 60px;
+  /* Push distance label below the road */
   left: 50%;
   transform: translateX(-50%);
   background: var(--navy);
@@ -2935,5 +2941,33 @@ select {
   font-size: 11px;
   font-weight: bold;
   white-space: nowrap;
+}
+
+/* Map Controls */
+.map-controls {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+.map-btn {
+  background: var(--navy);
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s;
+}
+
+.map-btn:hover {
+  background: var(--orange);
+  transform: translateY(-2px);
 }
 
