@@ -1,17 +1,39 @@
 <%- include('partials/header') %>
 
-  <section class="app-section active">
+<style>
+  .app-main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; height: calc(100vh - 75px); }
+  .app-footer { display: none !important; }
+  body { overflow: hidden; } /* Disable outer scroll */
+  
+  /* Make map wrapper truly fullscreen */
+  .journey-map-wrapper {
+    height: 100% !important;
+    min-height: unset !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    overflow: auto; /* Enable scrolling inside the map */
+  }
+  
+  /* Fix container so pins can overflow vertically inside the scrollable wrapper if needed */
+  .journey-track-container {
+    height: 100% !important;
+    min-height: 500px !important;
+  }
+</style>
 
-    <div class="journey-header" style="text-align: center; margin-bottom: 40px;">
-      <h2 class="section-title" style="font-size: 26px; color: var(--navy); margin-bottom: 8px;">رحلة الوعد إلى مكة
-        المكرمة 🕋</h2>
-      <p class="section-desc" style="font-size: 15px; color: #666;">كل نقطة يكتسبها الطالب تقرّبه كيلومتراً واحداً!
-        (الهدف: <%= TARGET_POINTS %> كم)</p>
-    </div>
+  <section class="app-section active" style="height: 100%; position: relative;">
 
     <!-- Map Container -->
     <div class="journey-map-wrapper">
       
+      <!-- Title Floating -->
+      <div class="journey-header" style="position: sticky; left: 50%; transform: translateX(-50%); top: 20px; z-index: 100; text-align: center; background: rgba(255,255,255,0.85); padding: 12px 24px; border-radius: 20px; backdrop-filter: blur(4px); display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <h2 class="section-title" style="font-size: 22px; color: var(--navy); margin-bottom: 4px;">رحلة الوعد إلى مكة المكرمة 🕋</h2>
+        <p class="section-desc" style="font-size: 14px; color: #444; margin: 0;">الهدف: <%= TARGET_POINTS %> كم</p>
+      </div>
+
       <!-- أزرار التوسيع والتصغير -->
       <div class="map-controls">
         <button class="map-btn" onclick="zoomMap(1500)">➕ توسيع الخريطة</button>
@@ -19,10 +41,10 @@
       </div>
 
       <div class="journey-track-container" id="mapTrack">
-
+        
         <!-- The Road Line -->
         <div class="journey-track"></div>
-
+        
         <!-- Start City (Riyadh) -->
         <div class="city-marker start-city">
           <div class="city-icon">🏙️</div>
@@ -67,25 +89,25 @@
             if (progress > 100) progress = 100;
             if (progress < 0) progress = 0; 
             
-            // ترتيب الطلاب في مجموعات (Cluster) إذا كان لديهم نفس النقاط تماماً
-            const MAX_PER_COLUMN = 3; // أقصى عدد للطلاب فوق بعضهم
-            const row = verticalIdx % MAX_PER_COLUMN;
-            const col = Math.floor(verticalIdx / MAX_PER_COLUMN);
+            // نفس خط الطول: توزيع الطلاب فوق وتحت الطريق بشكل متناوب (بدون إزاحة أفقية)
+            const isTop = verticalIdx % 2 === 0; // الزوجي فوق
+            const step = Math.floor(verticalIdx / 2); // 0, 1, 2, 3...
             
-            const verticalOffset = row * 34; // مسافة عمودية 34 بيكسل
-            
-            // إزاحة أفقية لتكوين صفوف بجانب بعضها لمنع صعودهم عالياً جداً
-            let horizontalOffset = 0;
-            if (col > 0) {
-              const dir = col % 2 === 0 ? 1 : -1; // يمين ويسار بالتبادل
-              const step = Math.ceil(col / 2);
-              horizontalOffset = dir * step * 32; // مسافة أفقية 32 بيكسل
+            // الطريق يقع في المنتصف (top: 50%). ارتفاعه 24 بيكسل (أي 12 بيكسل للأعلى و12 للأسفل).
+            // الدبوس ارتفاعه 28 بيكسل. لكي يجلس فوق الطريق نستخدم 12 بيكسل + (ترتيب الدبوس × 29 بيكسل مسافة)
+            const stackOffset = 14 + (step * 29); // 14px clearance from center, then 29px per stack
+
+            let positionStyle = '';
+            if (isTop) {
+              positionStyle = `bottom: calc(50% + ${stackOffset}px);`; // يصعد للأعلى
+            } else {
+              positionStyle = `top: calc(50% + ${stackOffset}px);`; // ينزل للأسفل
             }
 
             const rankClass = i < 5 ? `pin-rank-${i + 1}` : ''; 
         %>
           <div class="student-pin tooltip <%= rankClass %>" 
-               style="right: calc(<%= progress %>% + <%= horizontalOffset %>px); bottom: calc(50% - 15px + <%= verticalOffset %>px);">
+               style="right: <%= progress %>%; <%= positionStyle %>">
             <%= i + 1 %>
             <span class="tooltiptext"><%= s.name %> (<%= points %> كم)</span>
           </div>
