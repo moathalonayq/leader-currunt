@@ -2686,105 +2686,272 @@ select {
 .journey-map-wrapper {
   background-color: #E8D3A8;
   /* التراب / الصحراء */
-  background-image:
-    radial-gradient(#d5bc87 1px, transparent 1px),
-    radial-gradient(#d5bc87 1px, transparent 1px);
-  background-size: 20px 20px;
-  background-position: 0 0, 10px 10px;
-  border-radius: var(--radius-lg);
-  padding: 180px 20px;
-  /* زدت الارتفاع ليملأ الشاشة أكثر */
-  min-height: 500px;
-  margin: 30px 0;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
-  border: 3px solid #d5bc87;
-  overflow-x: auto;
-  position: relative;
 }
 
-.journey-track-container {
+  .gs-arrow {
+    transform: rotate(90deg);
+  }
+
+  .guardian-hero {
+    padding: 28px 18px;
+  }
+
+  .guardian-hero-text h2 {
+    font-size: 22px;
+  }
+}
+
+/* إصلاح: لون نص نتائج البحث داخل البانر الكحلي */
+.search-results {
+  color: var(--ink);
+}
+
+.search-item-name {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------
+   سجل البحث الأخير — بوابة ولي الأمر
+   --------------------------------------------------------- */
+.recent-searches {
+  margin-top: 14px;
+  text-align: right;
+}
+
+.recent-label {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.recent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.recent-item {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+}
+
+.recent-item:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: var(--yellow);
+}
+
+.recent-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.recent-group {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.recent-clear {
+  background: none;
+  border: none;
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 8px;
+  text-decoration: underline;
+  transition: 0.15s;
+}
+
+.recent-clear:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* =========================================================
+   قائمة الحضور بالجملة (لوحة المشرفين): أزرار الأسر + صفوف التحضير
+   ========================================================= */
+.attendance-category-title {
+  margin: 14px 0 8px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.attendance-category-title:first-child {
+  margin-top: 0;
+}
+
+.family-btn-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.family-btn {
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 16px 8px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.family-btn:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 640px) {
+  .family-btn {
+    padding: 12px 4px;
+    font-size: 12px;
+  }
+}
+
+.attendance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--cream-dark);
+  flex-wrap: wrap;
+}
+
+.attendance-row:last-child {
+  border-bottom: none;
+}
+
+.attendance-row-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.attendance-row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.att-btn {
+  border: 1.5px solid var(--cream-dark);
+  background: #fff;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+
+.att-btn.att-present.active {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #fff;
+}
+
+.att-btn.att-late.active {
+  background: #d97706;
+  border-color: #d97706;
+  color: #fff;
+}
+
+.att-btn.att-absent.active {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+/* =========================================================
+   Journey to Mecca Map Styles (S-Curve Edition)
+   ========================================================= */
+
+.game-map-viewport {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #5BB95F 0%, #A3C973 30%, #E8D3A8 70%, #d5bc87 100%);
   position: relative;
-  min-width: 4000px;
-  /* Expand massively to ensure space */
-  height: 120px;
-  /* Give vertical space */
+  scroll-behavior: smooth;
+}
+
+.svg-map-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 2000px; /* The exact height of our SVG viewBox */
   margin: 0 auto;
 }
 
-/* The Road Line (Realistic Asphalt) */
-.journey-track {
+#mapSvg {
   position: absolute;
-  top: 50%;
-  left: 60px;
-  right: 60px;
-  height: 24px;
-  background: #3b3b3b;
-  border-top: 2px solid #222;
-  border-bottom: 2px solid #222;
-  border-radius: 4px;
-  transform: translateY(-50%);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-.journey-track::after {
-  content: "";
-  position: absolute;
-  top: 50%;
+  top: 0;
   left: 0;
-  right: 0;
-  height: 4px;
-  background: repeating-linear-gradient(90deg, #F5C518 0, #F5C518 30px, transparent 30px, transparent 60px);
-  transform: translateY(-50%);
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
-/* City Markers */
-.city-marker {
+#pinsContainer {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  text-align: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.85);
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 2px solid var(--navy);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  pointer-events: none; /* Let clicks pass through empty areas */
 }
 
-.start-city {
-  right: 10px;
+/* We re-enable pointer events on interactive elements */
+.game-station, .student-pin {
+  pointer-events: auto;
 }
 
-.end-city {
-  left: 10px;
+/* City / Station Markers */
+.game-station {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 3;
 }
 
-.city-icon {
-  font-size: 32px;
-  margin-bottom: 4px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+.station-icon-lg {
+  font-size: 40px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+  margin-bottom: 5px;
 }
 
-.city-name {
+.station-name-lg {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--navy);
+  padding: 4px 12px;
+  border-radius: 12px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 14px;
-  color: var(--navy);
+  font-size: 13px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  border: 2px solid var(--navy);
   white-space: nowrap;
-}
-
-.city-dist {
-  font-size: 12px;
-  color: #718096;
-  font-weight: 600;
-  margin-top: 2px;
 }
 
 /* Student Pins */
 .student-pin {
   position: absolute;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   background: var(--navy);
   color: #fff;
   border-radius: 50%;
@@ -2793,181 +2960,71 @@ select {
   justify-content: center !important;
   text-align: center;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
-  /* Fix vertical alignment */
   padding-top: 2px;
-  /* Slight nudge down for arabic numbers */
-  border: 2px solid #fff;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
   cursor: pointer;
   z-index: 10;
+  transform: translate(-50%, -50%) scale(1);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Top 5 Marker Styles */
-.pin-rank-1 {
-  background: #F5C518 !important;
-  color: #fff;
-  transform: scale(1.15);
-  z-index: 15;
-  box-shadow: 0 0 10px rgba(245, 197, 24, 0.6);
-}
-
-.pin-rank-2 {
-  background: #C0C0C0 !important;
-  color: #fff;
-  transform: scale(1.1);
-  z-index: 14;
-  box-shadow: 0 0 8px rgba(192, 192, 192, 0.6);
-}
-
-.pin-rank-3 {
-  background: #CD7F32 !important;
-  color: #fff;
-  transform: scale(1.1);
-  z-index: 13;
-  box-shadow: 0 0 8px rgba(205, 127, 50, 0.6);
-}
-
-.pin-rank-4 {
-  background: #8A2BE2 !important;
-  color: #fff;
-  z-index: 12;
-}
-
-.pin-rank-5 {
-  background: #23B5AA !important;
-  color: #fff;
-  z-index: 12;
-}
-
 .student-pin:hover {
-  transform: scale(1.2);
+  transform: translate(-50%, -50%) scale(1.25);
   background: var(--orange);
   z-index: 20;
 }
 
-/* Pin Badge in Table */
-.pin-badge {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  background: var(--navy);
-  color: #fff;
-  border-radius: 50%;
-  text-align: center;
-  line-height: 24px;
-  font-weight: 700;
-  font-size: 12px;
-}
-
-.journey-table td {
-  vertical-align: middle;
-}
+/* Top 5 Marker Styles */
+.pin-rank-1 { background: #F5C518 !important; transform: translate(-50%, -50%) scale(1.2); z-index: 15; box-shadow: 0 0 12px rgba(245, 197, 24, 0.8); }
+.pin-rank-2 { background: #C0C0C0 !important; transform: translate(-50%, -50%) scale(1.15); z-index: 14; box-shadow: 0 0 10px rgba(192, 192, 192, 0.8); }
+.pin-rank-3 { background: #CD7F32 !important; transform: translate(-50%, -50%) scale(1.1); z-index: 13; box-shadow: 0 0 10px rgba(205, 127, 50, 0.8); }
+.pin-rank-4 { background: #8A2BE2 !important; z-index: 12; }
+.pin-rank-5 { background: #23B5AA !important; z-index: 12; }
 
 /* Tooltip container */
 .tooltip {
-  position: relative;
-  display: inline-block;
+  position: absolute;
+  /* position is relative to parent, but we already absolute positioned the pin. We don't want relative here!
+     Wait, .tooltip is applied to .student-pin which is absolute. So its children are positioned relative to the pin. */
 }
 
 .tooltip .tooltiptext {
   visibility: hidden;
   width: max-content;
-  background-color: #333;
+  background-color: #2d3748;
   color: #fff;
   text-align: center;
-  border-radius: 6px;
-  padding: 5px 10px;
+  border-radius: 8px;
+  padding: 6px 12px;
   position: absolute;
   z-index: 30;
-  bottom: 125%;
+  bottom: 130%; 
   left: 50%;
-  margin-left: -50px;
+  transform: translateX(-50%);
   opacity: 0;
-  transition: opacity 0.3s;
-  font-size: 12px;
-  font-weight: 600;
+  transition: opacity 0.3s, transform 0.3s;
+  font-size: 13px;
+  font-weight: 700;
   pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .tooltip .tooltiptext::after {
   content: "";
   position: absolute;
-  top: 100%;
+  top: 100%; 
   left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
+  margin-left: -6px;
+  border-width: 6px;
   border-style: solid;
-  border-color: #333 transparent transparent transparent;
+  border-color: #2d3748 transparent transparent transparent;
 }
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
+  transform: translateX(-50%) translateY(-5px);
 }
-
-.rank-gold-row {
-  background: rgba(245, 197, 24, 0.15) !important;
-}
-
-/* Station Markers (Every 200km) */
-.station-marker {
-  position: absolute;
-  top: 50%;
-  transform: translate(50%, -50%);
-  text-align: center;
-  z-index: 1;
-}
-
-.station-icon {
-  font-size: 24px;
-  margin-bottom: 25px;
-  /* Push it above the road */
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
-}
-
-.station-dist {
-  position: absolute;
-  top: 60px;
-  /* Push distance label below the road */
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--navy);
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: bold;
-  white-space: nowrap;
-}
-
-/* Map Controls */
-.map-controls {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  display: flex;
-  gap: 10px;
-  z-index: 100;
-}
-
-.map-btn {
-  background: var(--navy);
-  color: #fff;
-  padding: 8px 16px;
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-family: var(--font-display);
-  font-size: 14px;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s;
-}
-
-.map-btn:hover {
-  background: var(--orange);
-  transform: translateY(-2px);
-}
-

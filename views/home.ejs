@@ -4,129 +4,133 @@
   .app-main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; height: calc(100vh - 75px); }
   .app-footer { display: none !important; }
   body { overflow: hidden; } /* Disable outer scroll */
-  
-  /* Make map wrapper truly fullscreen */
-  .journey-map-wrapper {
-    height: 100% !important;
-    min-height: unset !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
-    border: none !important;
-    overflow: auto; /* Enable scrolling inside the map */
-  }
-  
-  /* Fix container so pins can overflow vertically inside the scrollable wrapper if needed */
-  .journey-track-container {
-    height: 100% !important;
-    min-height: 500px !important;
-  }
 </style>
 
-  <section class="app-section active" style="height: 100%; position: relative;">
+<section class="game-map-viewport" id="mapViewport">
 
-    <!-- Map Container -->
-    <div class="journey-map-wrapper">
+  <!-- Title Floating -->
+  <div style="position: fixed; left: 50%; transform: translateX(-50%); top: 90px; z-index: 100; text-align: center; background: rgba(255,255,255,0.9); padding: 12px 24px; border-radius: 20px; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); pointer-events: none;">
+    <h2 style="font-size: 20px; color: var(--navy); margin-bottom: 4px; font-family: var(--font-display); font-weight: 800;">رحلة الوعد إلى مكة المكرمة 🕋</h2>
+    <p style="font-size: 13px; color: #444; margin: 0; font-weight: 600;">الهدف: <%= TARGET_POINTS %> كم</p>
+  </div>
+
+  <div class="svg-map-container">
+    <!-- SVG Path for the Winding Road -->
+    <svg id="mapSvg" viewBox="0 0 400 2000" preserveAspectRatio="xMidYMid meet">
+      <!-- Outer Dirt Path -->
+      <path id="mainPath" 
+            d="M200,1950 C50,1800 50,1600 200,1500 C350,1400 350,1200 200,1100 C50,1000 50,800 200,700 C350,600 350,400 200,300 C50,200 200,50 200,50" 
+            fill="none" stroke="#D6A862" stroke-width="45" stroke-linecap="round"/>
       
-      <!-- Title Floating -->
-      <div class="journey-header" style="position: sticky; left: 50%; transform: translateX(-50%); top: 20px; z-index: 100; text-align: center; background: rgba(255,255,255,0.85); padding: 12px 24px; border-radius: 20px; backdrop-filter: blur(4px); display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-        <h2 class="section-title" style="font-size: 22px; color: var(--navy); margin-bottom: 4px;">رحلة الوعد إلى مكة المكرمة 🕋</h2>
-        <p class="section-desc" style="font-size: 14px; color: #444; margin: 0;">الهدف: <%= TARGET_POINTS %> كم</p>
-      </div>
+      <!-- Inner Dashed Line -->
+      <path d="M200,1950 C50,1800 50,1600 200,1500 C350,1400 350,1200 200,1100 C50,1000 50,800 200,700 C350,600 350,400 200,300 C50,200 200,50 200,50" 
+            fill="none" stroke="#F4DCA1" stroke-width="4" stroke-dasharray="15, 15" stroke-linecap="round"/>
+    </svg>
 
-      <!-- أزرار التوسيع والتصغير -->
-      <div class="map-controls">
-        <button class="map-btn" onclick="zoomMap(1500)">➕ توسيع الخريطة</button>
-        <button class="map-btn" onclick="zoomMap(-1500)">➖ تصغير</button>
-      </div>
+    <!-- Pins Container -->
+    <div id="pinsContainer"></div>
+  </div>
+</section>
 
-      <div class="journey-track-container" id="mapTrack">
-        
-        <!-- The Road Line -->
-        <div class="journey-track"></div>
-        
-        <!-- Start City (Riyadh) -->
-        <div class="city-marker start-city">
-          <div class="city-icon">🏙️</div>
-          <div class="city-name">الرياض</div>
-          <div class="city-dist">0 كم</div>
-        </div>
-
-        <!-- Waypoint Stations -->
-        <div class="station-marker" style="right: 20%;">
-          <div class="station-icon">⛽</div>
-          <div class="station-dist">200 كم</div>
-        </div>
-        <div class="station-marker" style="right: 40%;">
-          <div class="station-icon">🌴</div>
-          <div class="station-dist">400 كم</div>
-        </div>
-        <div class="station-marker" style="right: 60%;">
-          <div class="station-icon">⛽</div>
-          <div class="station-dist">600 كم</div>
-        </div>
-        <div class="station-marker" style="right: 80%;">
-          <div class="station-icon">🌴</div>
-          <div class="station-dist">800 كم</div>
-        </div>
-
-        <!-- End City (Mecca) -->
-        <div class="city-marker end-city">
-          <div class="city-icon">🕋</div>
-          <div class="city-name">مكة المكرمة</div>
-          <div class="city-dist"><%= TARGET_POINTS %> كم</div>
-        </div>
-
-        <!-- Student Pins -->
-        <% 
-          const pointCounts = {};
-          allStudents.forEach((s, i) => { 
-            const points = s.total_points;
-            pointCounts[points] = (pointCounts[points] || 0) + 1;
-            const verticalIdx = pointCounts[points] - 1; 
-            
-            let progress = (points / TARGET_POINTS) * 100;
-            if (progress > 100) progress = 100;
-            if (progress < 0) progress = 0; 
-            
-            // نفس خط الطول: توزيع الطلاب فوق وتحت الطريق بشكل متناوب (بدون إزاحة أفقية)
-            const isTop = verticalIdx % 2 === 0; // الزوجي فوق
-            const step = Math.floor(verticalIdx / 2); // 0, 1, 2, 3...
-            
-            // الطريق يقع في المنتصف (top: 50%). ارتفاعه 24 بيكسل (أي 12 بيكسل للأعلى و12 للأسفل).
-            // الدبوس ارتفاعه 28 بيكسل. لكي يجلس فوق الطريق نستخدم 12 بيكسل + (ترتيب الدبوس × 29 بيكسل مسافة)
-            const stackOffset = 14 + (step * 29); // 14px clearance from center, then 29px per stack
-
-            let positionStyle = '';
-            if (isTop) {
-              positionStyle = `bottom: calc(50% + ${stackOffset}px);`; // يصعد للأعلى
-            } else {
-              positionStyle = `top: calc(50% + ${stackOffset}px);`; // ينزل للأسفل
-            }
-
-            const rankClass = i < 5 ? `pin-rank-${i + 1}` : ''; 
-        %>
-          <div class="student-pin tooltip <%= rankClass %>" 
-               style="right: <%= progress %>%; <%= positionStyle %>">
-            <%= i + 1 %>
-            <span class="tooltiptext"><%= s.name %> (<%= points %> كم)</span>
-          </div>
-        <% }) %>
-      </div>
-    </div>
-
-  </section>
-
-  <%- include('partials/footer') %>
+<!-- Inject data for client-side plotting -->
 <script>
-  let currentMapWidth = 4000;
-  function zoomMap(amount) {
-    const track = document.getElementById("mapTrack");
-    if (!track) return;
-    currentMapWidth += amount;
-    if (currentMapWidth < 1500) currentMapWidth = 1500; // Minimum width
-    if (currentMapWidth > 15000) currentMapWidth = 15000; // Maximum width
-    track.style.minWidth = currentMapWidth + "px";
-  }
+  const allStudents = <%- JSON.stringify(allStudents) %>;
+  const targetPoints = <%= TARGET_POINTS %>;
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const path = document.getElementById('mainPath');
+    const pinsContainer = document.getElementById('pinsContainer');
+    const pathLength = path.getTotalLength();
+    
+    // 1. Draw Stations (Milestones)
+    const stations = [
+      { points: 0, icon: '🏙️', name: 'الرياض' },
+      { points: 200, icon: '⛽', name: 'استراحة' },
+      { points: 400, icon: '🌴', name: 'واحة' },
+      { points: 600, icon: '⛽', name: 'استراحة' },
+      { points: 800, icon: '🌴', name: 'واحة' },
+      { points: 1000, icon: '🕋', name: 'مكة المكرمة' },
+    ];
+    
+    stations.forEach(st => {
+      let progress = st.points / targetPoints;
+      if (progress > 1) progress = 1;
+      
+      const pt = path.getPointAtLength(progress * pathLength);
+      const x = (pt.x / 400) * 100;
+      const y = (pt.y / 2000) * 100;
+      
+      const stDiv = document.createElement('div');
+      stDiv.className = 'game-station';
+      stDiv.style.left = `${x}%`;
+      stDiv.style.top = `${y}%`;
+      stDiv.innerHTML = `
+        <div class="station-icon-lg">${st.icon}</div>
+        <div class="station-name-lg">${st.name} <span style="opacity:0.7; font-size:11px;">(${st.points} كم)</span></div>
+      `;
+      pinsContainer.appendChild(stDiv);
+    });
+
+    // 2. Draw Students
+    // Group students by exact score to handle overlaps
+    const pointGroups = {};
+    allStudents.forEach(s => {
+      if(!pointGroups[s.total_points]) pointGroups[s.total_points] = [];
+      pointGroups[s.total_points].push(s);
+    });
+    
+    let rank = 1;
+    
+    // Iterate over groups (sorted descending so rank 1 is highest points)
+    const sortedPoints = Object.keys(pointGroups).map(Number).sort((a,b) => b - a);
+    
+    sortedPoints.forEach(pts => {
+      const group = pointGroups[pts];
+      let progress = pts / targetPoints;
+      if (progress > 1) progress = 1;
+      if (progress < 0) progress = 0;
+      
+      const pt = path.getPointAtLength(progress * pathLength);
+      const xPercent = (pt.x / 400) * 100;
+      const yPercent = (pt.y / 2000) * 100;
+      
+      group.forEach((student, idx) => {
+        // Scatter logic for same exact point (Circular cluster)
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        if (idx > 0) {
+          const ring = Math.floor((idx - 1) / 6) + 1; 
+          const radius = ring * 18; // pixels
+          const angle = ((idx - 1) % 6) * 60; // 0, 60, 120, 180, 240, 300
+          const rad = angle * (Math.PI / 180);
+          offsetX = Math.cos(rad) * radius;
+          offsetY = Math.sin(rad) * radius;
+        }
+        
+        const pin = document.createElement('div');
+        const rankClass = rank <= 5 ? `pin-rank-${rank}` : '';
+        pin.className = `student-pin tooltip ${rankClass}`;
+        
+        pin.style.left = `calc(${xPercent}% + ${offsetX}px)`;
+        pin.style.top = `calc(${yPercent}% + ${offsetY}px)`;
+        
+        pin.innerHTML = `
+          ${rank}
+          <span class="tooltiptext">${student.name} (${pts} كم)</span>
+        `;
+        
+        pinsContainer.appendChild(pin);
+        rank++;
+      });
+    });
+
+    // 3. Scroll to Bottom (Start of Journey) initially
+    const viewport = document.getElementById('mapViewport');
+    if (viewport) {
+      viewport.scrollTop = viewport.scrollHeight - viewport.clientHeight;
+    }
+  });
 </script>
 
+<%- include('partials/footer') %>
