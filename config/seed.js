@@ -57,13 +57,11 @@ async function run() {
       database: process.env.DB_NAME || "qayrawan_club",
     };
 
-  const hostStr = typeof connectionConfig === "string" ? connectionConfig : connectionConfig.host;
-  const isLocal = hostStr.includes("localhost") || hostStr.includes("127.0.0.1");
-  const finalConfig = typeof connectionConfig === "string"
-    ? { uri: connectionConfig, multipleStatements: true, ...(!isLocal && { ssl: { rejectUnauthorized: false } }) }
-    : { ...connectionConfig, multipleStatements: true, ...(!isLocal && { ssl: { rejectUnauthorized: false } }) };
-
-  const connection = await mysql.createConnection(finalConfig);
+  const connection = await mysql.createConnection(
+    typeof connectionConfig === "string"
+      ? connectionConfig + (connectionConfig.includes("?") ? "&" : "?") + "multipleStatements=true"
+      : { ...connectionConfig, multipleStatements: true }
+  );
 
   try {
     console.log("⏳ إنشاء الجداول من schema.sql ...");

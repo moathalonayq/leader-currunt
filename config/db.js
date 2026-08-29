@@ -33,15 +33,12 @@ if (process.env.DATABASE_URL) {
   };
 }
 
-const isLocal = poolConfig.host === "localhost" || poolConfig.host === "127.0.0.1";
-
 const pool = mysql.createPool({
   ...poolConfig,
-  ...(!isLocal && { ssl: { rejectUnauthorized: false } }),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  dateStrings: true,
+  dateStrings: true, // نسترجع التواريخ كنص بسيط (YYYY-MM-DD) بدل كائن Date
 });
 
 module.exports = pool;
