@@ -23,36 +23,49 @@
           <div class="city-dist">0 كم</div>
         </div>
 
+        <!-- Waypoint Stations -->
+        <div class="station-marker" style="right: 20%;">
+          <div class="station-icon">⛽</div>
+          <div class="station-dist">200 كم</div>
+        </div>
+        <div class="station-marker" style="right: 40%;">
+          <div class="station-icon">🌴</div>
+          <div class="station-dist">400 كم</div>
+        </div>
+        <div class="station-marker" style="right: 60%;">
+          <div class="station-icon">⛽</div>
+          <div class="station-dist">600 كم</div>
+        </div>
+        <div class="station-marker" style="right: 80%;">
+          <div class="station-icon">🌴</div>
+          <div class="station-dist">800 كم</div>
+        </div>
+
         <!-- End City (Mecca) -->
         <div class="city-marker end-city">
           <div class="city-icon">🕋</div>
           <div class="city-name">مكة المكرمة</div>
-          <div class="city-dist">
-            <%= TARGET_POINTS %> كم
-          </div>
+          <div class="city-dist"><%= TARGET_POINTS %> كم</div>
         </div>
 
         <!-- Student Pins -->
-        <% 
-          const pointCounts = {};
-          allStudents.forEach((s, i) => { 
-            const points = s.total_points;
-            pointCounts[points] = (pointCounts[points] || 0) + 1;
-            const verticalIdx = pointCounts[points] - 1; 
-            
-            let progress = (points / TARGET_POINTS) * 100;
-            if (progress > 100) progress = 100;
-            if (progress < 0) progress = 0; 
-            
-            const verticalOffset = verticalIdx * 35; 
-            const rankClass = i < 5 ? `pin-rank-${i + 1}` : ''; 
-        %>
-          <div class="student-pin tooltip <%= rankClass %>" 
-               style="right: <%= progress %>%; bottom: calc(50% - 15px + <%= verticalOffset %>px);">
-            <%= i + 1 %>
-            <span class="tooltiptext"><%= s.name %> (<%= points %> كم)</span>
-          </div>
-        <% }) %>
+        <% const pointCounts={}; allStudents.forEach((s, i)=> {
+          const points = s.total_points;
+          pointCounts[points] = (pointCounts[points] || 0) + 1;
+          const verticalIdx = pointCounts[points] - 1;
+
+          let progress = (points / TARGET_POINTS) * 100;
+          if (progress > 100) progress = 100;
+          if (progress < 0) progress=0; const verticalOffset=verticalIdx * 35; const rankClass=i < 5 ? `pin-rank-${i +
+            1}` : '' ; %>
+            <div class="student-pin tooltip <%= rankClass %>"
+              style="right: <%= progress %>%; bottom: calc(50% - 15px + <%= verticalOffset %>px);">
+              <%= i + 1 %>
+                <span class="tooltiptext">
+                  <%= s.name %> (<%= points %> كم)
+                </span>
+            </div>
+            <% }) %>
       </div>
     </div>
 
