@@ -1,19 +1,21 @@
 <%- include('partials/header') %>
 
   <section class="app-section active">
-    
+
     <div class="journey-header" style="text-align: center; margin-bottom: 40px;">
-      <h2 class="section-title" style="font-size: 26px; color: var(--navy); margin-bottom: 8px;">رحلة الوعد إلى مكة المكرمة 🕋</h2>
-      <p class="section-desc" style="font-size: 15px; color: #666;">كل نقطة يكتسبها الطالب تقرّبه كيلومتراً واحداً! (الهدف: <%= TARGET_POINTS %> كم)</p>
+      <h2 class="section-title" style="font-size: 26px; color: var(--navy); margin-bottom: 8px;">رحلة الوعد إلى مكة
+        المكرمة 🕋</h2>
+      <p class="section-desc" style="font-size: 15px; color: #666;">كل نقطة يكتسبها الطالب تقرّبه كيلومتراً واحداً!
+        (الهدف: <%= TARGET_POINTS %> كم)</p>
     </div>
 
     <!-- Map Container -->
     <div class="journey-map-wrapper">
       <div class="journey-track-container">
-        
+
         <!-- The Road Line -->
         <div class="journey-track"></div>
-        
+
         <!-- Start City (Riyadh) -->
         <div class="city-marker start-city">
           <div class="city-icon">🏙️</div>
@@ -25,7 +27,9 @@
         <div class="city-marker end-city">
           <div class="city-icon">🕋</div>
           <div class="city-name">مكة المكرمة</div>
-          <div class="city-dist"><%= TARGET_POINTS %> كم</div>
+          <div class="city-dist">
+            <%= TARGET_POINTS %> كم
+          </div>
         </div>
 
         <!-- Student Pins -->
@@ -42,8 +46,11 @@
             
             // To prevent all stacked pins from blocking the road, we stack them vertically.
             const verticalOffset = verticalIdx * 35; // 35px spacing
+            
+            // Add top 5 classes
+            const rankClass = i < 5 ? `pin-rank-${i + 1}` : '';
         %>
-          <div class="student-pin tooltip" 
+          <div class="student-pin tooltip <%= rankClass %>" 
                style="right: <%= progress %>%; bottom: calc(50% - 15px + <%= verticalOffset %>px);">
             <%= i + 1 %>
             <span class="tooltiptext"><%= s.name %> (<%= points %> كم)</span>
@@ -54,7 +61,7 @@
 
     <!-- Legend Table -->
     <h3 class="section-title" style="font-size:19px; margin-top:40px;">📍 مواقع الطلاب الحالية</h3>
-    
+
     <div class="data-table-wrapper">
       <table class="data-table journey-table">
         <thead>
@@ -66,18 +73,32 @@
           </tr>
         </thead>
         <tbody>
-          <% allStudents.forEach((s, i) => { %>
-            <tr class="<%= s.total_points >= TARGET_POINTS ? 'rank-gold-row' : '' %>">
-              <td><div class="pin-badge"><%= i + 1 %></div></td>
-              <td><%= s.name %></td>
-              <td><%= s.group_name %></td>
-              <td><strong><%= s.total_points %> كم</strong></td>
+          <% allStudents.forEach((s, i) => { 
+            const isGoal = s.total_points >= TARGET_POINTS;
+            const rowClass = isGoal ? 'rank-gold-row' : '';
+            const pinClass = i < 5 ? `pin-rank-${i + 1}` : '';
+          %>
+            <tr class="<%= rowClass %>">
+              <td>
+                <div class="pin-badge <%= pinClass %>">
+                  <%= i + 1 %>
+                </div>
+              </td>
+              <td>
+                <%= s.name %>
+              </td>
+              <td>
+                <%= s.group_name %>
+              </td>
+              <td><strong>
+                  <%= s.total_points %> كم
+                </strong></td>
             </tr>
-          <% }) %>
+            <% }) %>
         </tbody>
       </table>
     </div>
 
   </section>
 
-<%- include('partials/footer') %>
+  <%- include('partials/footer') %>
