@@ -1,30 +1,144 @@
 <%- include('partials/header') %>
 
 <style>
-  .app-main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; height: calc(100vh - 75px); }
+  .app-main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; height: calc(100vh - 75px); background: #0F2027; }
   .app-footer { display: none !important; }
-  body { overflow: hidden; } /* Disable outer scroll */
+  body { overflow: hidden; background: #0F2027; } 
+  
+  .game-map-viewport {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    scroll-behavior: smooth;
+    /* Custom Scrollbar for the mountain */
+    scrollbar-width: thin;
+    scrollbar-color: #d96a40 #1A1A2E;
+  }
+  
+  .game-map-viewport::-webkit-scrollbar {
+    width: 8px;
+  }
+  .game-map-viewport::-webkit-scrollbar-track {
+    background: #1A1A2E;
+  }
+  .game-map-viewport::-webkit-scrollbar-thumb {
+    background: #d96a40;
+    border-radius: 4px;
+  }
+  
+  .svg-map-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: 3000px; 
+    margin: 0 auto;
+    overflow: hidden; 
+  }
+  
+  #mapSvg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+  }
+  
+  #pinsContainer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .game-station, .student-pin { pointer-events: auto; }
+  
+  /* Mountain Station Signs */
+  .mountain-sign {
+    background: #3e2723;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+    border: 2px solid #6d4c41;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  }
+  
+  .mountain-sign-icon {
+    font-size: 38px;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+  }
 </style>
 
 <section class="game-map-viewport" id="mapViewport">
 
-  <!-- Title Floating -->
-  <div style="position: fixed; left: 50%; transform: translateX(-50%); top: 90px; z-index: 100; text-align: center; background: rgba(255,255,255,0.9); padding: 12px 24px; border-radius: 20px; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); pointer-events: none;">
-    <h2 style="font-size: 20px; color: var(--navy); margin-bottom: 4px; font-family: var(--font-display); font-weight: 800;">رحلة الوعد إلى مكة المكرمة 🕋</h2>
-    <p style="font-size: 13px; color: #444; margin: 0; font-weight: 600;">الهدف: <%= TARGET_POINTS %> كم</p>
+  <!-- Mountain Title Floating -->
+  <div style="position: fixed; left: 50%; transform: translateX(-50%); top: 90px; z-index: 100; text-align: center; background: rgba(26,26,46,0.85); padding: 12px 24px; border-radius: 20px; backdrop-filter: blur(8px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: none; border: 1px solid rgba(255,255,255,0.1); min-width: 250px;">
+    <h2 style="font-size: 20px; color: #fff; margin-bottom: 4px; font-family: var(--font-display); font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">همّة طويق 🏔️</h2>
+    <p style="font-size: 13px; color: #F5C518; margin: 0; font-weight: 700;">القمة: <%= TARGET_POINTS %> كم</p>
   </div>
 
   <div class="svg-map-container">
-    <!-- SVG Path for the Winding Road -->
-    <svg id="mapSvg" viewBox="0 0 400 2000" preserveAspectRatio="xMidYMid meet">
-      <!-- Outer Dirt Path -->
-      <path id="mainPath" 
-            d="M200,1950 C50,1800 50,1600 200,1500 C350,1400 350,1200 200,1100 C50,1000 50,800 200,700 C350,600 350,400 200,300 C50,200 200,50 200,50" 
-            fill="none" stroke="#D6A862" stroke-width="45" stroke-linecap="round"/>
+    <!-- Epic Mountain SVG -->
+    <svg id="mapSvg" viewBox="0 0 600 3000" preserveAspectRatio="none">
+      <defs>
+         <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+           <stop offset="0%" stop-color="#0F2027"/>
+           <stop offset="50%" stop-color="#203A43"/>
+           <stop offset="100%" stop-color="#2C5364"/>
+         </linearGradient>
+         
+         <linearGradient id="mountGradBack" x1="0" y1="0" x2="0" y2="1">
+           <stop offset="0%" stop-color="#3c3b54"/>
+           <stop offset="100%" stop-color="#252a38"/>
+         </linearGradient>
+         
+         <linearGradient id="mountGradFront" x1="0" y1="0" x2="0" y2="1">
+           <stop offset="0%" stop-color="#a4502b"/> <!-- Rocky summit -->
+           <stop offset="30%" stop-color="#7a3b22"/>
+           <stop offset="100%" stop-color="#291410"/> <!-- Dark deep base -->
+         </linearGradient>
+      </defs>
       
-      <!-- Inner Dashed Line -->
-      <path d="M200,1950 C50,1800 50,1600 200,1500 C350,1400 350,1200 200,1100 C50,1000 50,800 200,700 C350,600 350,400 200,300 C50,200 200,50 200,50" 
-            fill="none" stroke="#F4DCA1" stroke-width="4" stroke-dasharray="15, 15" stroke-linecap="round"/>
+      <!-- Sky -->
+      <rect width="600" height="3000" fill="url(#skyGrad)"/>
+      
+      <!-- Stars (Night sky at the top) -->
+      <circle cx="120" cy="150" r="2.5" fill="#fff" opacity="0.9"/>
+      <circle cx="500" cy="250" r="1.5" fill="#fff" opacity="0.6"/>
+      <circle cx="350" cy="100" r="3" fill="#fff" opacity="1"/>
+      <circle cx="450" cy="60" r="1" fill="#fff" opacity="0.5"/>
+      <circle cx="200" cy="350" r="2" fill="#fff" opacity="0.7"/>
+      <circle cx="550" cy="400" r="2.5" fill="#fff" opacity="0.4"/>
+      <circle cx="50" cy="200" r="1.5" fill="#fff" opacity="0.8"/>
+      
+      <!-- Distant Mountain Range -->
+      <polygon points="0,3000 0,1600 150,1400 250,1600 450,1200 600,1500 600,3000" fill="url(#mountGradBack)" opacity="0.8"/>
+      <polygon points="0,3000 0,1800 200,1600 350,1750 550,1400 600,1600 600,3000" fill="#151b29" opacity="0.6"/>
+      
+      <!-- Main Tuwaiq Peak -->
+      <polygon points="10,3000 150,2300 180,1800 260,900 300,120 340,900 420,1800 450,2300 590,3000" fill="url(#mountGradFront)"/>
+      
+      <!-- Mountain Ridges / Shadows for 3D effect -->
+      <polygon points="300,120 260,900 300,1050 340,900" fill="#c4643b" opacity="0.25"/>
+      <polygon points="260,900 180,1800 260,1900 300,1050" fill="#c4643b" opacity="0.15"/>
+      <polygon points="340,900 420,1800 340,1900 300,1050" fill="#000000" opacity="0.15"/>
+      
+      <!-- The Zig Zag Trail (Glowing) -->
+      <!-- Added more segments so it feels like a steep climb -->
+      <path id="mainPath" 
+            d="M300,2880 L140,2500 L460,2100 L160,1700 L440,1300 L200,900 L400,500 L300,120" 
+            fill="none" stroke="#F5C518" stroke-width="8" stroke-dasharray="15, 10" opacity="0.8"/>
+            
+      <!-- Trail Glow -->
+      <path d="M300,2880 L140,2500 L460,2100 L160,1700 L440,1300 L200,900 L400,500 L300,120" 
+            fill="none" stroke="#F5C518" stroke-width="4" opacity="0.4" filter="drop-shadow(0 0 8px #F5C518)"/>
     </svg>
 
     <!-- Pins Container -->
@@ -32,7 +146,6 @@
   </div>
 </section>
 
-<!-- Inject data for client-side plotting -->
 <script>
   const allStudents = <%- JSON.stringify(allStudents) %>;
   const targetPoints = <%= TARGET_POINTS %>;
@@ -42,13 +155,13 @@
     const pinsContainer = document.getElementById('pinsContainer');
     const pathLength = path.getTotalLength();
     
-    // 1. Draw Stations (Milestones)
+    // 1. Draw Mountain Camps (Milestones)
     const stations = [
-      { points: 0, icon: '🏙️', name: 'الرياض' },
-      { points: 200, icon: '⛽', name: 'استراحة' },
-      { points: 400, icon: '🌴', name: 'واحة' },
-      { points: 600, icon: '⛽', name: 'استراحة' },
-      { points: 800, icon: '🌴', name: 'واحة' },
+      { points: 0, icon: '⛺', name: 'معسكر الانطلاق' },
+      { points: 200, icon: '🧗', name: 'هضبة العزم' },
+      { points: 400, icon: '🦅', name: 'جرف التحدي' },
+      { points: 600, icon: '☁️', name: 'طريق الغيوم' },
+      { points: 800, icon: '⛰️', name: 'قمة الوعد' },
       { points: 1000, icon: '🕋', name: 'مكة المكرمة' },
     ];
     
@@ -57,22 +170,22 @@
       if (progress > 1) progress = 1;
       
       const pt = path.getPointAtLength(progress * pathLength);
-      const x = (pt.x / 400) * 100;
-      const y = (pt.y / 2000) * 100;
+      // Coordinates mapping to percentage to ensure pure responsive scaling
+      const xPercent = (pt.x / 600) * 100;
+      const yPercent = (pt.y / 3000) * 100;
       
       const stDiv = document.createElement('div');
       stDiv.className = 'game-station';
-      stDiv.style.left = `${x}%`;
-      stDiv.style.top = `${y}%`;
+      stDiv.style.left = `${xPercent}%`;
+      stDiv.style.top = `${yPercent}%`;
       stDiv.innerHTML = `
-        <div class="station-icon-lg">${st.icon}</div>
-        <div class="station-name-lg">${st.name} <span style="opacity:0.7; font-size:11px;">(${st.points} كم)</span></div>
+        <div class="mountain-sign-icon">${st.icon}</div>
+        <div class="mountain-sign">${st.name} <span style="opacity:0.7; font-size:11px;">(${st.points} كم)</span></div>
       `;
       pinsContainer.appendChild(stDiv);
     });
 
-    // 2. Draw Students
-    // Group students by exact score to handle overlaps
+    // 2. Draw Students & Form "Crowds" on ledges
     const pointGroups = {};
     allStudents.forEach(s => {
       if(!pointGroups[s.total_points]) pointGroups[s.total_points] = [];
@@ -80,8 +193,6 @@
     });
     
     let rank = 1;
-    
-    // Iterate over groups (sorted descending so rank 1 is highest points)
     const sortedPoints = Object.keys(pointGroups).map(Number).sort((a,b) => b - a);
     
     sortedPoints.forEach(pts => {
@@ -91,28 +202,27 @@
       if (progress < 0) progress = 0;
       
       const pt = path.getPointAtLength(progress * pathLength);
-      const xPercent = (pt.x / 400) * 100;
-      const yPercent = (pt.y / 2000) * 100;
+      const xPercent = (pt.x / 600) * 100;
+      const yPercent = (pt.y / 3000) * 100;
       
       group.forEach((student, idx) => {
-        // Scatter logic for same exact point (Circular cluster)
-        let offsetX = 0;
-        let offsetY = 0;
+        // --- Epic Grid Logic for Clear Mobile View ---
+        // If 30 students are tied, we form a neat 5-column grid below their exact point!
+        const cols = 5; 
+        const row = Math.floor(idx / cols);
+        const col = idx % cols;
+        const itemsInThisRow = Math.min(cols, group.length - row * cols);
         
-        if (idx > 0) {
-          const ring = Math.floor((idx - 1) / 6) + 1; 
-          const radius = ring * 18; // pixels
-          const angle = ((idx - 1) % 6) * 60; // 0, 60, 120, 180, 240, 300
-          const rad = angle * (Math.PI / 180);
-          offsetX = Math.cos(rad) * radius;
-          offsetY = Math.sin(rad) * radius;
-        }
+        // Horizontal spacing: 38px. Vertical spacing: 38px.
+        const offsetX = (col - (itemsInThisRow - 1) / 2) * 38;
+        const offsetY = row * 38; 
         
         const pin = document.createElement('div');
         const rankClass = rank <= 5 ? `pin-rank-${rank}` : '';
         pin.className = `student-pin tooltip ${rankClass}`;
         
         pin.style.left = `calc(${xPercent}% + ${offsetX}px)`;
+        // Add offsetY to visually stack them backwards/downwards so they don't block the path ahead
         pin.style.top = `calc(${yPercent}% + ${offsetY}px)`;
         
         pin.innerHTML = `
@@ -125,7 +235,7 @@
       });
     });
 
-    // 3. Scroll to Bottom (Start of Journey) initially
+    // 3. Auto Scroll to Bottom (Start of Journey - Base Camp)
     const viewport = document.getElementById('mapViewport');
     if (viewport) {
       viewport.scrollTop = viewport.scrollHeight - viewport.clientHeight;
