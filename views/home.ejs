@@ -1,17 +1,18 @@
 <%- include('partials/header') %>
 
 <style>
-  .app-main { max-width: 100% !important; padding: 0 !important; margin: 0 !important; height: calc(100vh - 75px); background: #0F2027; }
-  .app-footer { display: none !important; }
-  body { overflow: hidden; background: #0F2027; } 
-  
   .game-map-viewport {
     width: 100%;
-    height: 100%;
+    height: 750px; /* Fixed height so it acts as a scrollable window inside the page */
+    border-radius: var(--radius-lg);
+    border: 4px solid #1A1A2E;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    background: #0F2027; /* Mountain sky background only inside the container */
     overflow-x: hidden;
     overflow-y: auto;
     position: relative;
     scroll-behavior: smooth;
+    margin: 20px 0 40px;
     /* Custom Scrollbar for the mountain */
     scrollbar-width: thin;
     scrollbar-color: #d96a40 #1A1A2E;
@@ -79,7 +80,7 @@
 <section class="game-map-viewport" id="mapViewport">
 
   <!-- Mountain Title Floating -->
-  <div style="position: fixed; left: 50%; transform: translateX(-50%); top: 90px; z-index: 100; text-align: center; background: rgba(26,26,46,0.85); padding: 12px 24px; border-radius: 20px; backdrop-filter: blur(8px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: none; border: 1px solid rgba(255,255,255,0.1); min-width: 250px;">
+  <div style="position: sticky; left: 50%; transform: translateX(-50%); top: 20px; z-index: 100; text-align: center; background: rgba(26,26,46,0.85); padding: 12px 24px; border-radius: 20px; backdrop-filter: blur(8px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: none; border: 1px solid rgba(255,255,255,0.1); width: fit-content; margin: 0 auto;">
     <h2 style="font-size: 20px; color: #fff; margin-bottom: 4px; font-family: var(--font-display); font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">همّة طويق 🏔️</h2>
     <p style="font-size: 13px; color: #F5C518; margin: 0; font-weight: 700;">القمة: <%= TARGET_POINTS %> كم</p>
   </div>
