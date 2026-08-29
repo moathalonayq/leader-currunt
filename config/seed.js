@@ -50,18 +50,20 @@ async function run() {
   const connectionConfig = process.env.DATABASE_URL
     ? process.env.DATABASE_URL
     : {
-        host: process.env.DB_HOST || "localhost",
-        port: process.env.DB_PORT || 3306,
-        user: process.env.DB_USER || "root",
-        password: process.env.DB_PASSWORD || "",
-        database: process.env.DB_NAME || "qayrawan_club",
-      };
+      host: process.env.DB_HOST || "localhost",
+      port: process.env.DB_PORT || 3306,
+      user: process.env.DB_USER || "root",
+      password: process.env.DB_PASSWORD || "",
+      database: process.env.DB_NAME || "qayrawan_club",
+    };
 
-  const connection = await mysql.createConnection(
-    typeof connectionConfig === "string"
-      ? connectionConfig + (connectionConfig.includes("?") ? "&" : "?") + "multipleStatements=true"
-      : { ...connectionConfig, multipleStatements: true }
-  );
+  const hostStr = typeof connectionConfig === "string" ? connectionConfig : connectionConfig.host;
+  const isLocal = hostStr.includes("localhost") || hostStr.includes("127.0.0.1");
+  const finalConfig = typeof connectionConfig === "string"
+    ? { uri: connectionConfig, multipleStatements: true, ...(!isLocal && { ssl: { rejectUnauthorized: false } }) }
+    : { ...connectionConfig, multipleStatements: true, ...(!isLocal && { ssl: { rejectUnauthorized: false } }) };
+
+  const connection = await mysql.createConnection(finalConfig);
 
   try {
     console.log("⏳ إنشاء الجداول من schema.sql ...");
