@@ -38,17 +38,14 @@
           allStudents.forEach((s, i) => { 
             const points = s.total_points;
             pointCounts[points] = (pointCounts[points] || 0) + 1;
-            const verticalIdx = pointCounts[points] - 1; // 0, 1, 2...
+            const verticalIdx = pointCounts[points] - 1; 
             
             let progress = (points / TARGET_POINTS) * 100;
             if (progress > 100) progress = 100;
-            if (progress < 0) progress = 0;
+            if (progress < 0) progress = 0; 
             
-            // To prevent all stacked pins from blocking the road, we stack them vertically.
-            const verticalOffset = verticalIdx * 35; // 35px spacing
-            
-            // Add top 5 classes
-            const rankClass = i < 5 ? `pin-rank-${i + 1}` : '';
+            const verticalOffset = verticalIdx * 35; 
+            const rankClass = i < 5 ? `pin-rank-${i + 1}` : ''; 
         %>
           <div class="student-pin tooltip <%= rankClass %>" 
                style="right: <%= progress %>%; bottom: calc(50% - 15px + <%= verticalOffset %>px);">
@@ -73,28 +70,27 @@
           </tr>
         </thead>
         <tbody>
-          <% allStudents.forEach((s, i) => { 
+          <% allStudents.forEach((s, i)=> {
             const isGoal = s.total_points >= TARGET_POINTS;
             const rowClass = isGoal ? 'rank-gold-row' : '';
-            const pinClass = i < 5 ? `pin-rank-${i + 1}` : '';
-          %>
-            <tr class="<%= rowClass %>">
-              <td>
-                <div class="pin-badge <%= pinClass %>">
-                  <%= i + 1 %>
-                </div>
-              </td>
-              <td>
-                <%= s.name %>
-              </td>
-              <td>
-                <%= s.group_name %>
-              </td>
-              <td><strong>
-                  <%= s.total_points %> كم
-                </strong></td>
-            </tr>
-            <% }) %>
+            const pinClass = i < 5 ? `pin-rank-${i + 1}` : '' ; %>
+              <tr class="<%= rowClass %>">
+                <td>
+                  <div class="pin-badge <%= pinClass %>">
+                    <%= i + 1 %>
+                  </div>
+                </td>
+                <td>
+                  <%= s.name %>
+                </td>
+                <td>
+                  <%= s.group_name %>
+                </td>
+                <td><strong>
+                    <%= s.total_points %> كم
+                  </strong></td>
+              </tr>
+              <% }) %>
         </tbody>
       </table>
     </div>
