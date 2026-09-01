@@ -34,5 +34,6 @@ router.post("/api/supervisor/archive-week", requireAdminApi, supervisorControlle
 
 router.post("/api/supervisor/category-points", requireSupervisorApi, supervisorController.updateCategoryPoints);
 router.post("/api/supervisor/mega-groups/points", requireSupervisorApi, supervisorController.updateMegaGroupPoints);
+router.post("/api/supervisor/mega-groups/assign", requireSupervisorApi, supervisorController.assignMegaGroup);
 
 module.exports = router;

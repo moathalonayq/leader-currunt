@@ -1,4 +1,6 @@
+﻿const fs = require("fs");
 
+let code = `
 <%- include("partials/header") %>
 
 <section class="app-section active" style="max-width: 1000px; margin: 0 auto;">
@@ -99,26 +101,26 @@
     const mg = allMegaGroups[index];
     const container = document.getElementById("detailsContainer");
     
-    let html = `<h3 style="text-align: center; font-size: 28px; margin-bottom: 20px; color: #f59e0b;">${mg.name}</h3>`;
+    let html = \`<h3 style="text-align: center; font-size: 28px; margin-bottom: 20px; color: #f59e0b;">\${mg.name}</h3>\`;
     
     if (mg.usras && mg.usras.length > 0) {
       mg.usras.forEach(usra => {
-        html += `
+        html += \`
           <div class="mega-usra-block">
-            <div class="mega-usra-title">${usra.name}</div>
+            <div class="mega-usra-title">\${usra.name}</div>
             <div class="mega-student-list">
-        `;
+        \`;
         if (usra.students && usra.students.length > 0) {
           usra.students.forEach(s => {
-            html += `<div class="mega-student-item">${s.name}</div>`;
+            html += \`<div class="mega-student-item">\${s.name}</div>\`;
           });
         } else {
-          html += `<div style="color: #94a3b8; font-size: 14px;">لا يوجد طلاب</div>`;
+          html += \`<div style="color: #94a3b8; font-size: 14px;">لا يوجد طلاب</div>\`;
         }
-        html += `</div></div>`;
+        html += \`</div></div>\`;
       });
     } else {
-      html += `<p style="text-align: center; color: #64748b; font-size: 16px;">لم يتم ربط أسر بهذه المجموعة الكبرى بعد.</p>`;
+      html += \`<p style="text-align: center; color: #64748b; font-size: 16px;">لم يتم ربط أسر بهذه المجموعة الكبرى بعد.</p>\`;
     }
     
     container.innerHTML = html;
@@ -132,3 +134,8 @@
     document.getElementById("megaGroupsList").classList.remove("hidden");
   }
 </script>
+`;
+
+fs.writeFileSync("views/mega-groups.ejs", code);
+console.log("Updated mega-groups.ejs");
+

@@ -63,6 +63,16 @@ const pool = require("./config/db");
   }
 
   try {
+    await pool.query("ALTER TABLE `groups` ADD COLUMN mega_group_id INT DEFAULT NULL");
+    await pool.query("ALTER TABLE `groups` ADD CONSTRAINT fk_mega_group FOREIGN KEY (mega_group_id) REFERENCES mega_groups(id) ON DELETE SET NULL");
+    console.log("Auto-migration: Added mega_group_id to groups table");
+  } catch (err) {
+    if (err.code !== 'ER_DUP_FIELDNAME') {
+      console.error("Auto-migration mega_group_id error:", err);
+    }
+  }
+
+  try {
     const requiredDates = ["2026-09-10", "2026-09-17", "2026-09-24", "2026-09-28", "2026-10-01", "2026-10-08", "2026-10-12", "2026-10-15", "2026-10-22", "2026-10-26", "2026-10-29", "2026-11-05", "2026-11-09", "2026-11-12", "2026-11-19", "2026-11-26", "2026-11-30", "2026-12-03", "2026-12-10", "2026-12-14", "2026-12-17", "2026-12-24"];
 
     // Find old sessions

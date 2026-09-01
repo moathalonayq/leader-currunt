@@ -567,15 +567,15 @@ async function sendAllWeeklyReminders(req, res, next) {
   try {
     const weekNumber = Number(req.body.weekNumber);
     const studentIds = req.body.studentIds || [];
-    
+
     if (!weekNumber) {
       return res.status(400).json({ success: false, message: "الرجاء تحديد أسبوع صحيح" });
     }
 
     const fullList = await studentModel.getWeeklyReminderList(weekNumber);
     // Filter list to only included studentIds, if provided
-    const list = studentIds.length > 0 
-      ? fullList.filter(s => studentIds.includes(s.id)) 
+    const list = studentIds.length > 0
+      ? fullList.filter(s => studentIds.includes(s.id))
       : fullList;
 
     const results = { sent: 0, failed: [] };
@@ -604,7 +604,7 @@ async function sendAllWeeklyReminders(req, res, next) {
   }
 }
 
-  module.exports = {
+module.exports = {
   showLoginPage,
   handleLogin,
   handleLogout,
@@ -651,6 +651,19 @@ module.exports.updateMegaGroupPoints = async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error("updateMegaGroupPoints error:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+module.exports.assignMegaGroup = async (req, res) => {
+  try {
+    const { groupId, megaGroupId } = req.body;
+    if (!groupId) {
+      return res.status(400).json({ success: false, error: "Missing group id" });
+    }
+    await megaGroupModel.assignGroupToMegaGroup(groupId, megaGroupId || null);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("assignMegaGroup error:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 };
