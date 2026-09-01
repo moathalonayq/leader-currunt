@@ -618,3 +618,16 @@ module.exports = {
   sendWeeklyReminder,
   sendAllWeeklyReminders,
 };
+
+
+async function updateCategoryPoints(req, res, next) {
+  try {
+    const { studentId, category, points } = req.body;
+    await studentModel.updateCategoryPoints(studentId, category, points);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+}
+module.exports.updateCategoryPoints = updateCategoryPoints;
+

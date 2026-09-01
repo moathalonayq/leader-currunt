@@ -80,20 +80,45 @@
 
     const container = document.getElementById('groupDetailContainer');
     const scoreCols = scoresVisible
-      ? `<th class="col-initiative">🌟 مبادرة</th><th class="col-score">الذاتي</th><th class="col-score">حضور</th><th class="col-total">الإجمالي</th>`
+      ? \`<th class="col-initiative">🌟 مبادرة</th>
+         <th class="col-score">الثقافي</th>
+         <th class="col-score">الرياضي</th>
+         <th class="col-score">الذاتي</th>
+         <th class="col-score">حضور</th>
+         <th class="col-total">الإجمالي</th>\`
       : '';
     const rows = group.members.map((m, i) => {
       const rowClass = i === 0 ? 'rank-gold-row' : i === 1 ? 'rank-silver-row' : i === 2 ? 'rank-bronze-row' : '';
+      
+      const culturalDropdown = <%- isSupervisor ? 'true' : 'false' %> 
+        ? \`<select class="points-select" onchange="updateCatPoints(\${m.id}, 'cultural', this.value)">
+             <option value="0" \${!m.cultural_points ? 'selected' : ''}>0</option>
+             \${[5,10,15,20,25,30,35,40].map(v => \`<option value="\${v}" \${m.cultural_points === v ? 'selected' : ''}>\${v}</option>\`).join('')}
+           </select>\`
+        : (m.cultural_points || 0);
+
+      const sportsDropdown = <%- isSupervisor ? 'true' : 'false' %> 
+        ? \`<select class="points-select" onchange="updateCatPoints(\${m.id}, 'sports', this.value)">
+             <option value="0" \${!m.sports_points ? 'selected' : ''}>0</option>
+             \${[5,10,15,20,25,30,35,40].map(v => \`<option value="\${v}" \${m.sports_points === v ? 'selected' : ''}>\${v}</option>\`).join('')}
+           </select>\`
+        : (m.sports_points || 0);
+
       const scoreCells = scoresVisible
-        ? `<td class="col-initiative">${m.initiatives_points > 0 ? '+' + m.initiatives_points : '—'}</td><td class="col-score">${m.knowledge_points}</td><td class="col-score">${m.attendance_points}</td><td class="col-total"><strong>${m.total_points}</strong></td>`
+        ? \`<td class="col-initiative">\${m.initiatives_points > 0 ? '+' + m.initiatives_points : '—'}</td>
+           <td class="col-score">\${culturalDropdown}</td>
+           <td class="col-score">\${sportsDropdown}</td>
+           <td class="col-score">\${m.knowledge_points}</td>
+           <td class="col-score">\${m.attendance_points}</td>
+           <td class="col-total"><strong id="total-\${m.id}">\${m.total_points}</strong></td>\`
         : '';
-      return `
-        <tr class="${rowClass}">
-          <td>${i + 1}</td>
-          <td><a href="/guardian?student=${m.id}" class="student-link">${m.name}</a></td>
-          ${scoreCells}
+      return \`
+        <tr class="\${rowClass}">
+          <td>\${i + 1}</td>
+          <td><a href="/guardian?student=\${m.id}" class="student-link">\${m.name}</a></td>
+          \${scoreCells}
         </tr>
-      `;
+      \`;
     }).join('');
 
     container.innerHTML = `
@@ -125,4 +150,23 @@
   }
 
   renderGroups();
+
+  async function updateCatPoints(studentId, category, points) {
+    try {
+      const res = await fetch('/api/supervisor/category-points', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId, category, points: Number(points) })
+      });
+      if (res.ok) {
+        // optionally update the total, or let the user refresh to see it correctly 
+        // to properly update the total in place, we'd need to recalculate.
+        // I will just show a quick notification or nothing.
+      } else {
+        alert('حدث خطأ أثناء التحديث');
+      }
+    } catch (e) {
+      alert('حدث خطأ في الاتصال');
+    }
+  }
 </script>

@@ -33,3 +33,4 @@ router.post("/api/supervisor/toggle-scores", requireAdminApi, supervisorControll
 router.post("/api/supervisor/archive-week", requireAdminApi, supervisorController.archiveWeekPoints);
 
 module.exports = router;
+router.post("/api/supervisor/category-points", requireSupervisorApi, supervisorController.updateCategoryPoints);
