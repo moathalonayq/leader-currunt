@@ -21,6 +21,20 @@ const PORT = process.env.PORT || 3000;
 // نثق بالبروكسي الأمامي (Railway) حتى يتعرّف Express على أن الاتصال HTTPS فعلياً
 // عبر ترويسة X-Forwarded-Proto، وإلا فلن يُحفَظ كوكي الجلسة (secure: true) أبداً
 // ويفشل تسجيل دخول المشرف/الإدارة في الإنتاج رغم صحة الرمز
+// Auto-migrate new columns
+const pool = require("./config/db");
+(async () => {
+  try {
+    await pool.query("ALTER TABLE students ADD COLUMN cultural_points INT DEFAULT 0, ADD COLUMN sports_points INT DEFAULT 0");
+    console.log("Auto-migration: Added cultural/sports points columns");
+  } catch (err) {
+    // Ignore error if columns already exist (ER_DUP_FIELDNAME)
+    if (err.code !== 'ER_DUP_FIELDNAME') {
+      console.error("Auto-migration error:", err);
+    }
+  }
+})();
+
 app.set("trust proxy", 1);
 
 /* -------- محرك القوالب EJS -------- */
