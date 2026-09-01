@@ -111,33 +111,40 @@
         </form>
       </div>
 
-      <!-- البرنامج الرياضي والثقافي -->
+      
+      <!-- البرنامج الرياضي والثقافي والجماهيري -->
       <div class="panel-box">
-        <h4>🏅 البرنامج الرياضي والثقافي</h4>
+        <h4>🏅 البرنامج الرياضي والثقافي والجماهيري</h4>
         <form id="catPointsForm">
-          <input type="hidden" id="catPointsStudentSelect">
           <div class="form-group">
-            <label>اختر الطالب</label>
-            <div style="display:flex; gap:10px;">
-              <select id="catPointsGroupPicker" class="form-select" style="flex:1;">
-                <option value="">اختر الأسرة</option>
-              </select>
-              <select id="catPointsStudentPicker" class="form-select" style="flex:1;" disabled>
-                <option value="">اختر الطالب</option>
-              </select>
-            </div>
+            <label>اختر المجموعة</label>
+            <select id="catPointsMegaGroupSelect" class="form-select" required>
+              <option value="">اختر المجموعة</option>
+              <% megaGroups.forEach(mg => { %>
+                <option value="<%= mg.id %>"><%= mg.name %></option>
+              <% }) %>
+            </select>
           </div>
           <div class="form-group">
             <label for="catPointsCategory">البرنامج</label>
-            <select id="catPointsCategory" class="form-select">
+            <select id="catPointsCategory" class="form-select" required>
               <option value="">اختر البرنامج</option>
               <option value="cultural">الثقافي</option>
               <option value="sports">الرياضي</option>
+              <option value="audience">الجماهيري</option>
             </select>
           </div>
           <div class="form-group">
             <label for="catPointsAmount">عدد النقاط</label>
             <select id="catPointsAmount" class="form-select">
+              <option value="-40">-40 (خصم)</option>
+              <option value="-35">-35 (خصم)</option>
+              <option value="-30">-30 (خصم)</option>
+              <option value="-25">-25 (خصم)</option>
+              <option value="-20">-20 (خصم)</option>
+              <option value="-15">-15 (خصم)</option>
+              <option value="-10">-10 (خصم)</option>
+              <option value="-5">-5 (خصم)</option>
               <option value="0">0</option>
               <option value="5">5</option>
               <option value="10">10</option>

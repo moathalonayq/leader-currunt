@@ -5,10 +5,10 @@ const megaGroupModel = require("../models/megaGroupModel");
 router.get("/", async (req, res, next) => {
   try {
     const megaGroups = await megaGroupModel.getMegaGroupDetails();
-    res.render("mega-groups", { 
+    res.render("mega-groups", {
       pageTitle: "المجموعات",
       activeNav: "mega-groups",
-      megaGroups 
+      megaGroups
     });
   } catch (err) {
     next(err);

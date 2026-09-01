@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {\n
       btn.textContent = "جاري الحفظ...";
       
       try {
-        const res = await fetch("/supervisor/api/supervisor/mega-groups/assign", {
+        const res = await fetch("/api/supervisor/mega-groups/assign", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ groupId, megaGroupId })
@@ -583,12 +583,12 @@ function setupCatPointsForm() {
   if (!btn) return;
 
   btn.addEventListener("click", async () => {
-    const studentId = document.getElementById("catPointsStudentSelect").value;
+    const groupId = document.getElementById("catPointsMegaGroupSelect").value;
     const category = document.getElementById("catPointsCategory").value;
     const points = document.getElementById("catPointsAmount").value;
 
-    if (!studentId) {
-      showMsg(msg, "الرجاء اختيار الطالب", "error");
+    if (!groupId) {
+      showMsg(msg, "الرجاء اختيار المجموعة الكبرى", "error");
       return;
     }
     if (!category) {
@@ -598,18 +598,21 @@ function setupCatPointsForm() {
 
     btn.disabled = true;
     try {
-      const res = await fetch("/api/supervisor/category-points", {
+      const res = await fetch("/api/supervisor/mega-groups/points", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId, category, points: Number(points) })
+        body: JSON.stringify({ groupId, axis: category, points })
       });
-      if (res.ok) {
-        showMsg(msg, "تم التحديث بنجاح", "success");
-        setTimeout(() => location.reload(), 1500);
+      const data = await res.json();
+
+      if (data.success) {
+        showMsg(msg, "تم تحديث النقاط بنجاح!", "success");
+        setTimeout(() => window.location.reload(), 1000);
       } else {
-        showMsg(msg, "حدث خطأ أثناء التحديث", "error");
+        showMsg(msg, data.error || "حدث خطأ غير معروف", "error");
       }
-    } catch (e) {
+    } catch (err) {
+      console.error(err);
       showMsg(msg, "حدث خطأ في الاتصال بالخادم", "error");
     } finally {
       btn.disabled = false;
