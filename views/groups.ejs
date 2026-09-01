@@ -81,8 +81,6 @@
         const container = document.getElementById('groupDetailContainer');
         const scoreCols = scoresVisible
           ?`<th class="col-initiative">🌟 مبادرة</th>
-         <th class="col-score">الثقافي</th>
-         <th class="col-score">الرياضي</th>
          <th class="col-score">الذاتي</th>
          <th class="col-score">حضور</th>
          <th class="col-total">الإجمالي</th>`
@@ -90,24 +88,10 @@
     const rows = group.members.map((m, i) => {
       const rowClass = i === 0 ? 'rank-gold-row' : i === 1 ? 'rank-silver-row' : i === 2 ? 'rank-bronze-row' : '';
       
-      const culturalDropdown = <%- isSupervisor ? 'true' : 'false' %> 
-        ? `<select class="points-select" onchange="updateCatPoints(${m.id}, 'cultural', this.value)">
-             <option value="0" ${!m.cultural_points ? 'selected' : ''}>0</option>
-             ${[5,10,15,20,25,30,35,40].map(v => `<option value="${v}" ${m.cultural_points === v ? 'selected' : ''}>${v}</option>`).join('')}
-           </select>`
-        : (m.cultural_points || 0);
 
-      const sportsDropdown = <%- isSupervisor ? 'true' : 'false' %> 
-        ? `<select class="points-select" onchange="updateCatPoints(${m.id}, 'sports', this.value)">
-             <option value="0" ${!m.sports_points ? 'selected' : ''}>0</option>
-             ${[5,10,15,20,25,30,35,40].map(v => `<option value="${v}" ${m.sports_points === v ? 'selected' : ''}>${v}</option>`).join('')}
-           </select>`
-        : (m.sports_points || 0);
 
       const scoreCells = scoresVisible
         ? `<td class="col-initiative">${m.initiatives_points > 0 ? '+' + m.initiatives_points : '—'}</td>
-           <td class="col-score">${culturalDropdown}</td>
-           <td class="col-score">${sportsDropdown}</td>
            <td class="col-score">${m.knowledge_points}</td>
            <td class="col-score">${m.attendance_points}</td>
            <td class="col-total"><strong id="total-${m.id}">${m.total_points}</strong></td>`
@@ -122,7 +106,7 @@
     }).join('');
 
     container.innerHTML = `
-            < div class="group-card" >
+      <div class="group-card">
         <div class="group-card-header">
           <div class="group-rank-badge">1</div>
           <div>
@@ -134,7 +118,7 @@
           <thead><tr><th>الترتيب</th><th>اسم الطالب</th>${scoreCols}</tr></thead>
           <tbody>${rows}</tbody>
         </table>
-      </div >
+      </div>
     `;
 
     updateBreadcrumb([

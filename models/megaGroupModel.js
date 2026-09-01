@@ -1,4 +1,4 @@
-﻿const pool = require("../config/db");
+const pool = require("../config/db");
 const groupModel = require("./groupModel");
 
 const getAllMegaGroups = async () => {
@@ -43,23 +43,23 @@ const getMegaGroupDetails = async () => {
     FROM mega_groups
     ORDER BY total_points DESC, name ASC
   `);
-  
+
   // Get all groups with their mega_group_id
   const [groups] = await pool.query("SELECT id, name, mega_group_id FROM \`groups\` WHERE mega_group_id IS NOT NULL");
-  
+
   // Get all students
   const [students] = await pool.query("SELECT id, name, group_id FROM students");
-  
+
   for (const mg of mgs) {
-    mg.usras = groups.filter(g => g.mega_group_id === mg.id).map(g => {
+    mg.usras = groups.filter(g => g.mega_group_id == mg.id).map(g => {
       return {
         id: g.id,
         name: g.name,
-        students: students.filter(s => s.group_id === g.id)
+        students: students.filter(s => s.group_id == g.id)
       };
     });
   }
-  
+
   return mgs;
 };
 
