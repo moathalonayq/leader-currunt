@@ -21,9 +21,9 @@
   <%- include('partials/footer') %>
 
     <script>
-      const scoresVisible = <% - JSON.stringify(scoresVisible) %>;
+      const scoresVisible = <%- JSON.stringify(scoresVisible) %>;
 
-      const allGroups = <% - JSON.stringify(groups.map(g => ({
+      const allGroups = <%- JSON.stringify(groups.map(g => ({
         id: g.id, name: g.name, category: g.category,
         member_count: g.member_count, total_points: g.total_points, avg_points: g.avg_points,
         members: g.members.map(m => ({ id: m.id, name: m.name, total_points: m.total_points, knowledge_points: m.knowledge_points, attendance_points: m.attendance_points, initiatives_points: m.initiatives_points, cultural_points: m.cultural_points, sports_points: m.sports_points }))
