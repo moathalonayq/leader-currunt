@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-  
+
   const megaGroupForm = document.getElementById("megaGroupForm");
   if (megaGroupForm) {
     megaGroupForm.addEventListener("submit", async (e) => {
