@@ -134,10 +134,12 @@ async function getTopStudents(limit = 10) {
   const [rows] = await pool.query(`
     SELECT
       s.id, s.name, g.name AS group_name,
-      (s.knowledge_points + s.attendance_points) AS total_points
+      s.knowledge_points, s.attendance_points, s.cultural_points, s.sports_points,
+      COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = s.id), 0) AS initiatives_points,
+      (s.knowledge_points + s.attendance_points + COALESCE(s.cultural_points, 0) + COALESCE(s.sports_points, 0) + COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = s.id), 0)) AS total_points
     FROM students s
     JOIN \`groups\` g ON g.id = s.group_id
-    ORDER BY total_points DESC
+    ORDER BY total_points DESC, s.name ASC
     LIMIT ?
   `, [limit]);
   return rows;
@@ -148,9 +150,7 @@ async function getStudentRankOverall(studentId) {
   // الترتيب (بخلاف الإجمالي المعروض) يحتسب نقاط المبادرات أيضاً
   const [rows] = await pool.query(`
     SELECT s.id,
-      (s.knowledge_points + s.attendance_points
-        + COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = s.id), 0)
-      ) AS total_points
+      (s.knowledge_points + s.attendance_points + COALESCE(s.cultural_points, 0) + COALESCE(s.sports_points, 0) + COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = s.id), 0)) AS total_points
     FROM students s
     ORDER BY total_points DESC
   `);
@@ -163,9 +163,7 @@ async function getStudentRankInGroup(studentId, groupId) {
   // الترتيب (بخلاف الإجمالي المعروض) يحتسب نقاط المبادرات أيضاً
   const [rows] = await pool.query(`
     SELECT id, name,
-      (knowledge_points + attendance_points
-        + COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = students.id), 0)
-      ) AS total_points
+      (knowledge_points + attendance_points + COALESCE(cultural_points, 0) + COALESCE(sports_points, 0) + COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = students.id), 0)) AS total_points
     FROM students
     WHERE group_id = ?
     ORDER BY total_points DESC

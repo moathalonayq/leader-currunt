@@ -117,7 +117,7 @@
         min-width: 60px;
         border: 1px solid #e2e8f0;
       }
-      
+
       .ind-stat-value {
         font-size: 18px;
         font-weight: 900;
@@ -126,13 +126,13 @@
         line-height: 1.1;
         margin-bottom: 3px;
       }
-      
+
       .ind-stat-label {
         font-size: 11px;
         color: #64748b;
         font-weight: 600;
       }
-      
+
       .ind-points {
         text-align: center;
         background: #f8fafc;
@@ -187,10 +187,8 @@
     <div class="individual-list">
       <% if (allStudents && allStudents.length> 0) { %>
         <% allStudents.forEach((s, i)=> {
-          const isTop3 = i < 3; 
-          const rankClass=isTop3 ? `rank-${i+1}` : 'rank-other'; 
-          const rankIcon=i===0 ? '🏆' : i===1 ? '🥈' : i===2 ? '🥉' : (i + 1); 
-        %>
+          const isTop3 = i < 3; const rankClass=isTop3 ? `rank-${i+1}` : 'rank-other' ; const rankIcon=i===0 ? '🏆' :
+            i===1 ? '🥈' : i===2 ? '🥉' : (i + 1); %>
             <div class="individual-card <%= rankClass %>">
               <div class="ind-rank">
                 <%= rankIcon %>
@@ -206,15 +204,21 @@
 
               <div class="ind-stats-container">
                 <div class="ind-stat">
-                  <span class="ind-stat-value"><%= s.initiatives_points || 0 %></span>
+                  <span class="ind-stat-value">
+                    <%= s.initiatives_points || 0 %>
+                  </span>
                   <span class="ind-stat-label">مبادرات</span>
                 </div>
                 <div class="ind-stat">
-                  <span class="ind-stat-value"><%= s.attendance_points || 0 %></span>
+                  <span class="ind-stat-value">
+                    <%= s.attendance_points || 0 %>
+                  </span>
                   <span class="ind-stat-label">حضور</span>
                 </div>
                 <div class="ind-stat">
-                  <span class="ind-stat-value"><%= s.knowledge_points || 0 %></span>
+                  <span class="ind-stat-value">
+                    <%= s.knowledge_points || 0 %>
+                  </span>
                   <span class="ind-stat-label">ذاتي</span>
                 </div>
               </div>
