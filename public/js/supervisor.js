@@ -9,6 +9,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   setupStudentSearchSelects();
   setupPointsForm();
+  setupCatPointsForm();
   setupKnowledgeTasksPanel();
   setupBarcodeModal();
   setupGlobalToggleScores();
@@ -372,6 +373,8 @@ function setupStudentSearchSelects() {
   setupStudentSearchSelect("moveStudentSearch", "moveStudentResults", "moveStudentSelect", students);
 
   setupGroupStudentPicker("initiativeGroupPicker", "initiativeStudentPicker", "initiativeStudentSelect", students);
+  setupGroupStudentPicker("catPointsGroupPicker", "catPointsStudentPicker", "catPointsStudentSelect", students);
+  setupGroupStudentPicker("catPointsGroupPicker", "catPointsStudentPicker", "catPointsStudentSelect", students);
   setupGroupStudentPicker("tasksGroupPicker", "tasksStudentPicker", "tasksStudentSelect", students, (id) => {
     loadKnowledgeTasks(id);
   });
@@ -501,6 +504,50 @@ function setupStudentSearchSelect(inputId, resultsId, hiddenId, students, onSele
 /* =========================================================
    1) تسجيل مبادرة (إضافة / خصم نقاط بأحد المحاور الأربعة)
    ========================================================= */
+
+/* =========================================================
+   Update Cultural/Sports Points Form
+   ========================================================= */
+function setupCatPointsForm() {
+  const btn = document.getElementById("updateCatPointsBtn");
+  const msg = document.getElementById("catPointsMsg");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    const studentId = document.getElementById("catPointsStudentSelect").value;
+    const category = document.getElementById("catPointsCategory").value;
+    const points = document.getElementById("catPointsAmount").value;
+
+    if (!studentId) {
+      showMsg(msg, "الرجاء اختيار الطالب", "error");
+      return;
+    }
+    if (!category) {
+      showMsg(msg, "الرجاء اختيار البرنامج", "error");
+      return;
+    }
+
+    btn.disabled = true;
+    try {
+      const res = await fetch("/api/supervisor/category-points", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId, category, points: Number(points) })
+      });
+      if (res.ok) {
+        showMsg(msg, "تم التحديث بنجاح", "success");
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showMsg(msg, "حدث خطأ أثناء التحديث", "error");
+      }
+    } catch (e) {
+      showMsg(msg, "حدث خطأ في الاتصال بالخادم", "error");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
+
 function setupPointsForm() {
   const addBtn = document.getElementById("addInitiativeBtn");
   const subtractBtn = document.getElementById("subtractInitiativeBtn");
