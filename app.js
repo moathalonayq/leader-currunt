@@ -14,6 +14,7 @@ const groupRoutes = require("./routes/groupRoutes");
 const supervisorRoutes = require("./routes/supervisorRoutes");
 const displayRoutes = require("./routes/displayRoutes");
 const dailyAttendanceRoutes = require("./routes/dailyAttendanceRoutes");
+const megaGroupRoutes = require("./routes/megaGroupRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,22 +35,50 @@ const pool = require("./config/db");
   }
 
   try {
-    const requiredDates = ["2026-09-10","2026-09-17","2026-09-24","2026-09-28","2026-10-01","2026-10-08","2026-10-12","2026-10-15","2026-10-22","2026-10-26","2026-10-29","2026-11-05","2026-11-09","2026-11-12","2026-11-19","2026-11-26","2026-11-30","2026-12-03","2026-12-10","2026-12-14","2026-12-17","2026-12-24"];
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS mega_groups (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL UNIQUE,
+        cultural_points INT DEFAULT 0,
+        sports_points INT DEFAULT 0,
+        audience_points INT DEFAULT 0
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
     
+    const megaGroups = [
+      ["العطاء", 0, 0, 0],
+      ["البناء", 0, 0, 0],
+      ["الإخاء", 0, 0, 0]
+    ];
+    
+    for (const mg of megaGroups) {
+      await pool.query(
+        "INSERT IGNORE INTO mega_groups (name, cultural_points, sports_points, audience_points) VALUES (?, ?, ?, ?)",
+        mg
+      );
+    }
+    console.log("Auto-migration: Mega groups setup complete");
+  } catch(err) {
+    console.error("Auto-migration mega groups error:", err);
+  }
+
+  try {
+    const requiredDates = ["2026-09-10", "2026-09-17", "2026-09-24", "2026-09-28", "2026-10-01", "2026-10-08", "2026-10-12", "2026-10-15", "2026-10-22", "2026-10-26", "2026-10-29", "2026-11-05", "2026-11-09", "2026-11-12", "2026-11-19", "2026-11-26", "2026-11-30", "2026-12-03", "2026-12-10", "2026-12-14", "2026-12-17", "2026-12-24"];
+
     // Find old sessions
     const [oldSessions] = await pool.query("SELECT id FROM sessions WHERE session_date NOT IN (?)", [requiredDates]);
     if (oldSessions.length > 0) {
       console.log(`Migrating sessions table... found ${oldSessions.length} old sessions to delete.`);
       const oldIds = oldSessions.map(r => r.id);
-      
+
       // Delete attendance for those sessions first (in case ON DELETE CASCADE is missing)
       await pool.query("DELETE FROM attendance WHERE session_id IN (?)", [oldIds]);
-      
+
       // Delete the old sessions
       await pool.query("DELETE FROM sessions WHERE id IN (?)", [oldIds]);
       console.log("Old sessions and their attendance deleted.");
     }
-    
+
     // Insert the required dates if they don't exist
     const sessionsToInsert = [
       ["2026-09-10", "الخميس", 1],
@@ -75,7 +104,7 @@ const pool = require("./config/db");
       ["2026-12-17", "الخميس", 15],
       ["2026-12-24", "الخميس", 16]
     ];
-    
+
     for (const s of sessionsToInsert) {
       await pool.query("INSERT IGNORE INTO sessions (session_date, day_name, week_number) VALUES (?, ?, ?)", s);
     }
@@ -122,6 +151,7 @@ app.use("/", groupRoutes);
 app.use("/", supervisorRoutes);
 app.use("/", displayRoutes);
 app.use("/", dailyAttendanceRoutes);
+app.use("/mega-groups", megaGroupRoutes);
 
 /* -------- صفحة 404 -------- */
 app.use((req, res) => {

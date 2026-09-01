@@ -9,7 +9,11 @@
 
 const pool = require("../config/db");
 const studentModel = require("../models/studentModel");
+const attendanceModel = require("../models/attendanceModel");
+const settingsModel = require("../models/settingsModel");
 const groupModel = require("../models/groupModel");
+const { getScoresVisible } = require("../models/settingsModel");
+const megaGroupModel = require("../models/megaGroupModel");
 const sessionModel = require("../models/sessionModel");
 const archiveModel = require("../models/archiveModel");
 const whatsappService = require("../services/whatsappService");
@@ -116,6 +120,7 @@ async function showPanel(req, res, next) {
     const students = await studentModel.getAllStudents();
     const groups = await groupModel.getAllGroupsSimple();
     const sessions = await sessionModel.getAllSessions();
+    const megaGroups = await megaGroupModel.getAllMegaGroups();
     const scoresVisible = await getScoresVisible();
     const currentSession = await sessionModel.getCurrentOrNextSession();
 
@@ -148,6 +153,7 @@ async function showPanel(req, res, next) {
       students,
       groups,
       sessions,
+      megaGroups,
       attendanceMap,
       scoresVisible,
       allGroups,
@@ -638,3 +644,17 @@ async function updateCategoryPoints(req, res, next) {
 }
 module.exports.updateCategoryPoints = updateCategoryPoints;
 
+\n
+exports.updateMegaGroupPoints = async (req, res) => {
+  try {
+    const { groupId, axis, points } = req.body;
+    if (!groupId || !axis || points === undefined) {
+      return res.status(400).json({ success: false, error: "Missing required fields" });
+    }
+    await megaGroupModel.addPointsToMegaGroup(groupId, axis, parseInt(points, 10));
+    res.json({ success: true });
+  } catch (err) {
+    console.error("updateMegaGroupPoints error:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

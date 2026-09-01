@@ -32,5 +32,7 @@ router.post("/api/supervisor/self-tasks/delete", requireAdminApi, supervisorCont
 router.post("/api/supervisor/toggle-scores", requireAdminApi, supervisorController.toggleScoresVisible);
 router.post("/api/supervisor/archive-week", requireAdminApi, supervisorController.archiveWeekPoints);
 
-module.exports = router;
 router.post("/api/supervisor/category-points", requireSupervisorApi, supervisorController.updateCategoryPoints);
+router.post("/api/supervisor/mega-groups/points", requireSupervisorApi, supervisorController.updateMegaGroupPoints);
+
+module.exports = router;
