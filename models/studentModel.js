@@ -269,10 +269,14 @@ async function setSelfAchievementDone(studentId, taskId, done) {
     if (!task.points || task.points <= 0) {
       return { error: "لا يمكن إنجاز هذا المتطلب لأن نقاطه صفرية من إعدادات الذاتي" };
     }
-    const sessionModel = require("./sessionModel");
-    const currentSession = await sessionModel.getCurrentOrNextSession();
+    const programStartDate = new Date("2026-09-10T00:00:00");
+    const now = new Date();
+    // Calculate the current week number (Week 1 starts on Sep 10, Week 2 on Sep 17, etc.)
+    const diffTime = Math.max(0, now.getTime() - programStartDate.getTime());
+    const currentWeekNumber = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000)) + 1;
+    
     let awardedPoints = task.points;
-    if (currentSession && task.week_number < currentSession.week_number) {
+    if (task.week_number < currentWeekNumber) {
       awardedPoints = Math.round(task.points / 2);
     }
     
