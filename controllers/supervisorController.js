@@ -9,10 +9,7 @@
 
 const pool = require("../config/db");
 const studentModel = require("../models/studentModel");
-const attendanceModel = require("../models/attendanceModel");
-const settingsModel = require("../models/settingsModel");
 const groupModel = require("../models/groupModel");
-const { getScoresVisible } = require("../models/settingsModel");
 const megaGroupModel = require("../models/megaGroupModel");
 const sessionModel = require("../models/sessionModel");
 const archiveModel = require("../models/archiveModel");
@@ -644,8 +641,7 @@ async function updateCategoryPoints(req, res, next) {
 }
 module.exports.updateCategoryPoints = updateCategoryPoints;
 
-\n
-exports.updateMegaGroupPoints = async (req, res) => {
+module.exports.updateMegaGroupPoints = async (req, res) => {
   try {
     const { groupId, axis, points } = req.body;
     if (!groupId || !axis || points === undefined) {

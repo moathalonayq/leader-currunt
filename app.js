@@ -44,13 +44,13 @@ const pool = require("./config/db");
         audience_points INT DEFAULT 0
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
-    
+
     const megaGroups = [
       ["العطاء", 0, 0, 0],
       ["البناء", 0, 0, 0],
       ["الإخاء", 0, 0, 0]
     ];
-    
+
     for (const mg of megaGroups) {
       await pool.query(
         "INSERT IGNORE INTO mega_groups (name, cultural_points, sports_points, audience_points) VALUES (?, ?, ?, ?)",
@@ -58,7 +58,7 @@ const pool = require("./config/db");
       );
     }
     console.log("Auto-migration: Mega groups setup complete");
-  } catch(err) {
+  } catch (err) {
     console.error("Auto-migration mega groups error:", err);
   }
 
