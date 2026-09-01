@@ -2,59 +2,263 @@
 
   <section class="app-section active">
 
-    <!-- =========================================================
-         نظرة عامة على القسم
-         ========================================================= -->
-    <h2 class="section-title">نظرة عامة على قسم واعد</h2>
-    <p class="section-desc">إحصائية شاملة عن قسم واعد وأداء الطلاب في جميع البرامج</p>
+    <style>
+      .legendary-wrapper {
+        background: #0f172a;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        margin: 20px 0;
+        overflow-x: auto;
+      }
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value"><%= stats.totalStudents %></div>
-        <div class="stat-label">عدد الطلاب</div>
-      </div>
-      <div class="stat-card gold">
-        <div class="stat-value"><%= stats.totalGroups %></div>
-        <div class="stat-label">عدد المجموعات</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value"><%= stats.attendanceRate || 0 %></div>
-        <div class="stat-label">عدد الحضور</div>
-      </div>
-      <div class="stat-card knowledge">
-        <div class="stat-value"><%= stats.totalKnowledge %></div>
-        <div class="stat-label">نقاط البرنامج الذاتي</div>
-      </div>
-      <div class="stat-card gold">
-        <div class="stat-value"><%= stats.totalInitiatives %></div>
-        <div class="stat-label">نقاط المبادرات المميزة</div>
+      .legendary-inner {
+        min-width: 800px;
+        position: relative;
+        direction: rtl;
+      }
+
+      .l-header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+      .l-title {
+        font-size: 34px;
+        color: #fbbf24;
+        font-weight: 900;
+        margin-bottom: 12px;
+        text-shadow: 0 2px 10px rgba(251,191,36,0.3);
+      }
+      .l-desc {
+        color: #94a3b8;
+        font-size: 16px;
+      }
+
+      .l-chart-area {
+        position: relative;
+        padding-top: 35px; /* Space for grid labels */
+      }
+
+      .l-grid {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 215px; /* 200px name plate + 15px gap */
+        left: 0;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .l-grid-line {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        border-right: 1px dashed rgba(255, 255, 255, 0.15);
+      }
+
+      .l-grid-label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin-right: -15px; /* Center horizontally */
+        width: 30px;
+        text-align: center;
+        color: #cbd5e1;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .l-rows {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .l-row {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .l-name-plate {
+        width: 200px;
+        min-width: 200px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-right: 4px solid #3b82f6;
+        border-radius: 10px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: background 0.3s, transform 0.3s;
+      }
+      .l-row:hover .l-name-plate {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateX(-4px);
+      }
+
+      .l-rank {
+        font-size: 16px;
+        font-weight: 900;
+        color: #64748b;
+        width: 24px;
+        text-align: center;
+      }
+
+      .l-name-info {
+        flex-grow: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .l-student-name {
+        color: #f8fafc;
+        font-size: 14px;
+        font-weight: 700;
+        display: block;
+      }
+      .l-group-name {
+        color: #94a3b8;
+        font-size: 11px;
+        margin-top: 4px;
+        display: block;
+      }
+
+      .l-track {
+        flex-grow: 1;
+        height: 22px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 11px;
+        position: relative;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+      }
+
+      .l-bar {
+        height: 100%;
+        border-radius: 11px;
+        background: linear-gradient(90deg, #2563eb, #60a5fa);
+        position: relative;
+        display: flex;
+        align-items: center;
+        min-width: 45px; 
+        width: 0;
+        transition: width 2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .l-score {
+        position: absolute;
+        right: 12px;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 900;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      }
+
+      .l-car {
+        position: absolute;
+        left: -16px;
+        font-size: 22px;
+        line-height: 1;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.6));
+      }
+      
+      @keyframes epicWobble {
+        0%, 100% { transform: translateY(-50%) rotate(0deg); }
+        25% { transform: translateY(-55%) rotate(-5deg); }
+        75% { transform: translateY(-45%) rotate(5deg); }
+      }
+      .l-row:hover .l-car, .l-bar.animate-active .l-car {
+        top: 50%;
+        animation: epicWobble 0.3s infinite;
+      }
+      .l-car {
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      /* Top 3 Styles */
+      .l-row:nth-child(1) .l-name-plate { border-right-color: #fbbf24; background: linear-gradient(90deg, rgba(251,191,36,0.15), rgba(255,255,255,0.02)); }
+      .l-row:nth-child(1) .l-rank { color: #fbbf24; }
+      .l-row:nth-child(1) .l-bar { background: linear-gradient(90deg, #d97706, #fbbf24); box-shadow: 0 0 15px rgba(251,191,36,0.4); }
+
+      .l-row:nth-child(2) .l-name-plate { border-right-color: #cbd5e1; background: linear-gradient(90deg, rgba(203,213,225,0.15), rgba(255,255,255,0.02)); }
+      .l-row:nth-child(2) .l-rank { color: #cbd5e1; }
+      .l-row:nth-child(2) .l-bar { background: linear-gradient(90deg, #64748b, #cbd5e1); box-shadow: 0 0 15px rgba(203,213,225,0.4); }
+
+      .l-row:nth-child(3) .l-name-plate { border-right-color: #d97706; background: linear-gradient(90deg, rgba(217,119,6,0.15), rgba(255,255,255,0.02)); }
+      .l-row:nth-child(3) .l-rank { color: #d97706; }
+      .l-row:nth-child(3) .l-bar { background: linear-gradient(90deg, #9a3412, #ea580c); box-shadow: 0 0 15px rgba(234,88,12,0.4); }
+
+    </style>
+
+    <div class="legendary-wrapper">
+      <div class="legendary-inner">
+        
+        <div class="l-header">
+          <div class="l-title">🏆 سباق الوعد الكبير 🏆</div>
+          <div class="l-desc">منافسة الأبطال نحو القمة ... تابع أداء جميع الطلاب في النادي</div>
+        </div>
+
+        <div class="l-chart-area">
+          
+          <!-- Grid Overlay covering only the track -->
+          <div class="l-grid">
+            <div class="l-grid-line" style="right: 0%;"><div class="l-grid-label">0</div></div>
+            <div class="l-grid-line" style="right: 5%;"><div class="l-grid-label">50</div></div>
+            <div class="l-grid-line" style="right: 10%;"><div class="l-grid-label">100</div></div>
+            <div class="l-grid-line" style="right: 50%;"><div class="l-grid-label">500</div></div>
+            <div class="l-grid-line" style="right: 100%;"><div class="l-grid-label">1000</div></div>
+          </div>
+
+          <div class="l-rows">
+            <% 
+              const studentsList = allStudents || [];
+              let maxScore = TARGET_POINTS || 1000;
+              if (studentsList.length > 0 && studentsList[0].total_points > maxScore) {
+                maxScore = studentsList[0].total_points;
+              }
+            %>
+            <% studentsList.forEach((s, i) => { 
+                 let widthPercent = (s.total_points / maxScore) * 100;
+                 if (widthPercent > 100) widthPercent = 100;
+                 if (widthPercent < 0) widthPercent = 0;
+                 const icon = i === 0 ? '🏆' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🏎️';
+            %>
+              <div class="l-row">
+                <div class="l-name-plate">
+                  <div class="l-rank"><%= i + 1 %></div>
+                  <div class="l-name-info">
+                    <span class="l-student-name"><%= s.name %></span>
+                    <span class="l-group-name"><%= s.group_name %></span>
+                  </div>
+                </div>
+                <div class="l-track">
+                  <div class="l-bar animate-bar" data-width="<%= widthPercent %>%">
+                    <span class="l-score"><%= s.total_points %></span>
+                    <span class="l-car"><%= icon %></span>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+        </div>
       </div>
     </div>
 
-    <!-- =========================================================
-         المتصدرون
-         ========================================================= -->
-    <h3 class="section-title" style="font-size:19px; margin-top:36px;">🏆 المتصدرون</h3>
-    <p class="section-desc">أفضل 10 طلاب حسب إجمالي النقاط</p>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          document.querySelectorAll('.animate-bar').forEach(bar => {
+            bar.style.width = bar.getAttribute('data-width');
+            bar.classList.add('animate-active');
+          });
+        }, 300);
+      });
+    </script>
 
-    <div class="data-table-wrapper">
-      <table class="data-table">
-        <thead>
-          <tr><th>#</th><th>الاسم</th><th>المجموعة</th><th>الإجمالي</th></tr>
-        </thead>
-        <tbody>
-          <% allStudents.slice(0, 10).forEach((s, i) => { %>
-            <tr class="<%= i === 0 ? 'rank-gold-row' : i === 1 ? 'rank-silver-row' : i === 2 ? 'rank-bronze-row' : '' %>">
-              <td><div class="pin-badge"><%= i + 1 %></div></td>
-              <td><%= s.name %></td>
-              <td><%= s.group_name %></td>
-              <td><strong><%= s.total_points %></strong></td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
-
-  </section>
-
-<%- include('partials/footer') %>
+  </section>< % -   i n c l u d e ( ' p a r t i a l s / f o o t e r ' )   % >  
+ 

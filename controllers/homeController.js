@@ -25,4 +25,18 @@ async function showHome(req, res, next) {
   }
 }
 
-module.exports = { showHome };
+async function showIndividual(req, res, next) {
+  try {
+    const allStudents = await studentModel.getTopStudents(500);
+
+    res.render("individual", {
+      pageTitle: "الفردي",
+      activeNav: "individual",
+      allStudents
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { showHome, showIndividual };

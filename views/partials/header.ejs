@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>قسم قائد | <%= pageTitle %></title>
+  <title>قسم قائد | <%= pageTitle %>
+  </title>
   <link rel="icon" type="image/png" href="/img/favicon.png">
   <link rel="stylesheet" href="/css/style.css">
 
   <!-- مكتبة توليد رموز QR -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
+
 <body>
 
   <div class="pattern-strip"></div>
@@ -19,14 +22,16 @@
 
     <nav class="main-nav">
       <a href="/" class="nav-btn <%= activeNav === 'home' ? 'active' : '' %>">الرئيسية</a>
+      <a href="/individual" class="nav-btn <%= activeNav === 'individual' ? 'active' : '' %>">الفردي</a>
       <a href="/guardian" class="nav-btn <%= activeNav === 'guardian' ? 'active' : '' %>">ملف الطالب</a>
       <a href="/groups" class="nav-btn <%= activeNav === 'groups' ? 'active' : '' %>">المجموعات</a>
-      <a href="/daily-attendance" class="nav-btn <%= activeNav === 'daily-attendance' ? 'active' : '' %>">التحضير اليومي</a>
+      <a href="/daily-attendance" class="nav-btn <%= activeNav === 'daily-attendance' ? 'active' : '' %>">التحضير
+        اليومي</a>
       <% if (isSupervisor) { %>
         <a href="/supervisor/panel" class="nav-btn <%= activeNav === 'supervisor' ? 'active' : '' %>">المشرفين</a>
-      <% } else { %>
-        <a href="/supervisor/login" class="nav-btn <%= activeNav === 'supervisor' ? 'active' : '' %>">المشرفين</a>
-      <% } %>
+        <% } else { %>
+          <a href="/supervisor/login" class="nav-btn <%= activeNav === 'supervisor' ? 'active' : '' %>">المشرفين</a>
+          <% } %>
     </nav>
   </header>
 
