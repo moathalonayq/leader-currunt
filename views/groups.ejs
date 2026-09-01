@@ -88,8 +88,6 @@
     const rows = group.members.map((m, i) => {
       const rowClass = i === 0 ? 'rank-gold-row' : i === 1 ? 'rank-silver-row' : i === 2 ? 'rank-bronze-row' : '';
       
-
-
       const scoreCells = scoresVisible
         ? `<td class="col-initiative">${m.initiatives_points > 0 ? '+' + m.initiatives_points : '—'}</td>
            <td class="col-score">${m.knowledge_points}</td>
