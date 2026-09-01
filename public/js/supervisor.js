@@ -6,19 +6,19 @@
    - عرض/طباعة باركود QR لكل طالب
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {\n
+document.addEventListener("DOMContentLoaded", () => {
   const assignMegaGroupForm = document.getElementById("assignMegaGroupForm");
   if (assignMegaGroupForm) {
     assignMegaGroupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const groupId = document.getElementById("assignGroupId").value;
       const megaGroupId = document.getElementById("assignMegaGroupId").value;
-      
+
       const btn = document.getElementById("assignSubmitBtn");
       const origText = btn.textContent;
       btn.disabled = true;
       btn.textContent = "جاري الحفظ...";
-      
+
       try {
         const res = await fetch("/api/supervisor/mega-groups/assign", {
           method: "POST",
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {\n
         } else {
           alert(data.error || "حدث خطأ");
         }
-      } catch(err) {
+      } catch (err) {
         alert("خطأ في الاتصال");
       } finally {
         btn.disabled = false;
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {\n
       }
     });
   }
-\n
+  
   const megaGroupForm = document.getElementById("megaGroupForm");
   if (megaGroupForm) {
     megaGroupForm.addEventListener("submit", async (e) => {
@@ -48,12 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {\n
       const groupId = document.getElementById("megaGroupId").value;
       const axis = document.getElementById("megaGroupAxis").value;
       const points = document.getElementById("megaGroupPoints").value;
-      
+
       const btn = document.getElementById("megaGroupSubmitBtn");
       const origText = btn.textContent;
       btn.disabled = true;
       btn.textContent = "جاري التحديث...";
-      
+
       try {
         const res = await fetch("/supervisor/api/supervisor/mega-groups/points", {
           method: "POST",
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {\n
         } else {
           alert(data.error || "حدث خطأ");
         }
-      } catch(err) {
+      } catch (err) {
         alert("خطأ في الاتصال");
       } finally {
         btn.disabled = false;

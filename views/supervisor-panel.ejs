@@ -111,7 +111,7 @@
         </form>
       </div>
 
-      
+
       <!-- البرنامج الرياضي والثقافي والجماهيري -->
       <div class="panel-box">
         <h4>🏅 البرنامج الرياضي والثقافي والجماهيري</h4>
@@ -120,9 +120,11 @@
             <label>اختر المجموعة</label>
             <select id="catPointsMegaGroupSelect" class="form-select" required>
               <option value="">اختر المجموعة</option>
-              <% megaGroups.forEach(mg => { %>
-                <option value="<%= mg.id %>"><%= mg.name %></option>
-              <% }) %>
+              <% megaGroups.forEach(mg=> { %>
+                <option value="<%= mg.id %>">
+                  <%= mg.name %>
+                </option>
+                <% }) %>
             </select>
           </div>
           <div class="form-group">
