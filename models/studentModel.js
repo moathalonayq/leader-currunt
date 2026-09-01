@@ -267,15 +267,22 @@ async function setSelfAchievementDone(studentId, taskId, done) {
 
   if (done && !existing.length) {
     if (!task.points || task.points <= 0) {
-      return { error: "لم يتم ضبط نقاط هذا المتطلب بعد، اضبطها أولاً من إعدادات الذاتي" };
+      return { error: "لا يمكن إنجاز هذا المتطلب لأن نقاطه صفرية من إعدادات الذاتي" };
     }
+    const sessionModel = require("./sessionModel");
+    const currentSession = await sessionModel.getCurrentOrNextSession();
+    let awardedPoints = task.points;
+    if (currentSession && task.week_number < currentSession.week_number) {
+      awardedPoints = Math.round(task.points / 2);
+    }
+    
     await pool.query(
       "INSERT INTO self_achievements (student_id, task_id, points) VALUES (?, ?, ?)",
-      [studentId, taskId, task.points]
+      [studentId, taskId, awardedPoints]
     );
     await pool.query(
       "UPDATE students SET knowledge_points = GREATEST(knowledge_points + ?, 0) WHERE id = ?",
-      [task.points, studentId]
+      [awardedPoints, studentId]
     );
   } else if (!done && existing.length) {
     const prevPoints = Number(existing[0].points) || 0;
@@ -286,10 +293,10 @@ async function setSelfAchievementDone(studentId, taskId, done) {
     );
   }
 
-  return { task_id: taskId, week_number: task.week_number, title: task.title, done, points: done ? task.points : 0 };
+  return task;
 }
 
-/* -------- إضافة متطلب ذاتي جديد لأسبوع معين -------- */
+  /* -------- إضافة متطلب ذاتي جديد لأسبوع معين -------- */
 async function addSelfTask(weekNumber, title, points) {
   const [result] = await pool.query(
     "INSERT INTO weekly_self_tasks (week_number, title, points) VALUES (?, ?, ?)",

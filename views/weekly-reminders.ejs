@@ -37,7 +37,7 @@
     <% } else { %>
       <% if (whatsappConfigured) { %>
         <div class="panel-box" style="margin-bottom:18px;">
-          <button type="button" id="sendAllBtn" class="btn btn-primary" style="width:100%;">🤖 إرسال تلقائي للجميع (<%= list.length %> طالب)</button>
+          <button type="button" id="sendSelectedBtn" class="btn btn-primary" style="width:100%;">🚀 إرسال للمحددين فقط</button>
           <p class="form-msg" id="sendAllMsg"></p>
         </div>
       <% } %>
@@ -46,26 +46,28 @@
         <table class="data-table" id="remindersTable">
           <thead>
             <tr>
+              <th><input type="checkbox" id="selectAllReminders" checked></th>
               <th>#</th>
               <th>الاسم</th>
               <th>الأسرة</th>
               <th>الجوال</th>
               <th>سبب التذكير</th>
-              <th>إرسال يدوي</th>
-              <% if (whatsappConfigured) { %><th>إرسال تلقائي</th><% } %>
+              <th>مراسلة يدوي</th>
+              <% if (whatsappConfigured) { %><th>مراسلة تلقائي</th><% } %>
             </tr>
           </thead>
           <tbody>
             <% list.forEach((s, i) => {
               const reasons = [];
               if (s.missedDays > 0) reasons.push('لم يحضر يوماً على الأقل من أيام الأسبوع');
-              if (s.missedTasks > 0) reasons.push('لم يُنجز أحد متطلبات الذاتي');
+              if (s.missedTasks > 0) reasons.push('لم ينجز أحد متطلبات الذاتي');
               const reasonText = reasons.join(' و ');
-              const message = `السلام عليكم، نود تذكير الطالب/ة ${s.name} (${s.group_name}) بأنه ${reasonText} للأسبوع ${weekNumber} في قسم قائد. نأمل الحرص الأسبوع القادم 🌱`;
+              const message = `السلام عليكم\nنود تذكير الطالب/ة ${s.name} (${s.group_name}) بأنه ${reasonText} للأسبوع ${weekNumber} في قسم واعد. نأمل الحرص الأسبوع القادم 🌷`;
               const intlPhone = s.phone && /^05\d{8}$/.test(s.phone) ? '966' + s.phone.slice(1) : null;
               const waLink = intlPhone ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(message)}` : null;
             %>
               <tr data-student-id="<%= s.id %>">
+                <td><input type="checkbox" class="reminder-cb" value="<%= s.id %>" checked></td>
                 <td><%= i + 1 %></td>
                 <td><%= s.name %></td>
                 <td><%= s.group_name %></td>
@@ -122,18 +124,34 @@
     });
   });
 
-  const sendAllBtn = document.getElementById("sendAllBtn");
-  if (sendAllBtn) {
-    sendAllBtn.addEventListener("click", async () => {
-      if (!confirm("سيتم إرسال رسالة تذكير لكل طالب في القائمة. متابعة؟")) return;
-      sendAllBtn.disabled = true;
-      sendAllBtn.textContent = "جارٍ الإرسال للجميع...";
+      const selectAll = document.getElementById("selectAllReminders");
+  if (selectAll) {
+    selectAll.addEventListener("change", (e) => {
+      document.querySelectorAll(".reminder-cb").forEach(cb => cb.checked = e.target.checked);
+    });
+  }
+
+  const sendSelectedBtn = document.getElementById("sendSelectedBtn");
+  if (sendSelectedBtn) {
+    sendSelectedBtn.addEventListener("click", async () => {
+      const selectedCb = Array.from(document.querySelectorAll(".reminder-cb:checked"));
+      if (selectedCb.length === 0) {
+        alert("الرجاء تحديد طالب واحد على الأقل");
+        return;
+      }
+      
+      const studentIds = selectedCb.map(cb => Number(cb.value));
+
+      if (!confirm("سيتم إرسال رسالة تذكير للطلاب المحددين (" + studentIds.length + " طالب). متأكد؟")) return;
+      
+      sendSelectedBtn.disabled = true;
+      sendSelectedBtn.textContent = "جاري الإرسال للمحددين...";
       const msg = document.getElementById("sendAllMsg");
       try {
         const res = await fetch("/api/supervisor/weekly-reminders/send-all", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ weekNumber }),
+          body: JSON.stringify({ weekNumber, studentIds }),
         });
         const data = await res.json();
         if (!data.success) {
@@ -141,15 +159,17 @@
           msg.textContent = data.message || "حدث خطأ";
         } else {
           msg.className = "form-msg success";
-          msg.textContent = `تم إرسال ${data.sent} رسالة بنجاح` + (data.failed.length ? `، وفشل ${data.failed.length} (${data.failed.map(f => f.name).join('، ')})` : '');
-          document.querySelectorAll(".btn-send-auto").forEach((b) => { b.textContent = "✅ أُرسلت"; b.disabled = true; });
+          msg.textContent = `تم الإرسال لـ ${data.sent} طالب بنجاح. (${data.failed.length} فشل)`;
+          if (data.failed.length > 0) {
+            console.log("Failed:", data.failed);
+          }
         }
       } catch (e) {
         msg.className = "form-msg error";
         msg.textContent = "حدث خطأ في الاتصال بالخادم";
       } finally {
-        sendAllBtn.disabled = false;
-        sendAllBtn.textContent = "🤖 إرسال تلقائي للجميع";
+        sendSelectedBtn.disabled = false;
+        sendSelectedBtn.textContent = "🚀 إرسال للمحددين فقط";
       }
     });
   }

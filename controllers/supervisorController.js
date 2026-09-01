@@ -563,11 +563,18 @@ async function sendWeeklyReminder(req, res, next) {
 async function sendAllWeeklyReminders(req, res, next) {
   try {
     const weekNumber = Number(req.body.weekNumber);
+    const studentIds = req.body.studentIds || [];
+    
     if (!weekNumber) {
-      return res.status(400).json({ success: false, message: "أدخل رقم أسبوع صحيح" });
+      return res.status(400).json({ success: false, message: "الرجاء تحديد أسبوع صحيح" });
     }
 
-    const list = await studentModel.getWeeklyReminderList(weekNumber);
+    const fullList = await studentModel.getWeeklyReminderList(weekNumber);
+    // Filter list to only included studentIds, if provided
+    const list = studentIds.length > 0 
+      ? fullList.filter(s => studentIds.includes(s.id)) 
+      : fullList;
+
     const results = { sent: 0, failed: [] };
 
     for (const student of list) {
@@ -585,7 +592,7 @@ async function sendAllWeeklyReminders(req, res, next) {
 
     await pool.query(
       "INSERT INTO activity_log (action) VALUES (?)",
-      [`إرسال تذكيرات واتساب جماعية للأسبوع ${weekNumber}: نجح ${results.sent}، فشل ${results.failed.length}`]
+      [`إرسال تذكيرات واتساب لمجموعة للأسبوع ${weekNumber}: نجح ${results.sent}، فشل ${results.failed.length}`]
     );
 
     res.json({ success: true, ...results });
@@ -594,7 +601,7 @@ async function sendAllWeeklyReminders(req, res, next) {
   }
 }
 
-module.exports = {
+  module.exports = {
   showLoginPage,
   handleLogin,
   handleLogout,
