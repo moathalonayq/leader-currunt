@@ -2,7 +2,7 @@
    controllers/supervisorController.js
    منطق لوحة المشرفين:
    - تسجيل الدخول برمز 991
-   - إضافة/خصم نقاط لأي طالب
+   - إضافة/خصم كيلوات لأي طالب
    - عرض كل الطلاب مع باركود كل واحد
    - تسجيل حضور تلقائي عند مسح باركود الطالب بالكاميرا
    ========================================================= */
@@ -16,7 +16,7 @@ const archiveModel = require("../models/archiveModel");
 const whatsappService = require("../services/whatsappService");
 
 // الإدارة: تحكم كامل (كل ما كان متاحاً سابقاً بدون أي تعديل)
-// المشرفون: تحضير (باركود + يدوي) + إضافة نقاط مبادرة فقط مع سبب إلزامي
+// المشرفون: تحضير (باركود + يدوي) + إضافة كيلوات مبادرة فقط مع سبب إلزامي
 // الرمزان يُضبَطان فقط عبر متغيرات البيئة (.env محلياً / متغيرات Railway في الإنتاج)
 // ولا يوجد لهما أي قيمة افتراضية مكتوبة في الكود لتجنّب نشرها في المستودع العام
 const ADMIN_ACCESS_CODE = process.env.ADMIN_ACCESS_CODE || "";
@@ -248,7 +248,7 @@ async function deleteStudent(req, res, next) {
   }
 }
 
-/* -------- API: إضافة أو خصم نقاط لطالب -------- */
+/* -------- API: إضافة أو خصم كيلوات لطالب -------- */
 async function addPoints(req, res, next) {
   try {
     const { studentId, program, amount, reason, mode } = req.body;
@@ -257,7 +257,7 @@ async function addPoints(req, res, next) {
     const studentIdNum = Number(studentId);
     let amountNum = Number(amount);
 
-    // عدد النقاط محدود بقيم ثابتة (5 إلى 40) لكل من الإدارة والمشرفين
+    // عدد الكيلوات محدود بقيم ثابتة (5 إلى 40) لكل من الإدارة والمشرفين
     const ALLOWED_AMOUNTS = [5, 10, 15, 20, 25, 30, 35, 40];
     if (!studentIdNum || !ALLOWED_AMOUNTS.includes(amountNum)) {
       return res.status(400).json({ success: false, message: "أدخل بيانات صحيحة" });
@@ -265,7 +265,7 @@ async function addPoints(req, res, next) {
 
     // دور "المشرفين" المحدود: مبادرة فقط
     if (req.session.role !== "admin" && program !== "initiative") {
-      return res.status(403).json({ success: false, message: "يمكنك فقط إضافة نقاط مبادرة / إنجاز مميز" });
+      return res.status(403).json({ success: false, message: "يمكنك فقط إضافة كيلوات مبادرة / إنجاز مميز" });
     }
 
     if (program === "initiative" && !studentModel.INITIATIVE_CATEGORIES.includes(category)) {
@@ -285,7 +285,7 @@ async function addPoints(req, res, next) {
 
     await pool.query(
       "INSERT INTO activity_log (action) VALUES (?)",
-      [`${actionLabel} ${Math.abs(amountNum)} نقطة (${programLabel})`]
+      [`${actionLabel} ${Math.abs(amountNum)} كيلو (${programLabel})`]
     );
 
     const updatedStudent = await studentModel.getStudentById(studentIdNum);
@@ -325,7 +325,7 @@ async function getSelfTaskConfig(req, res, next) {
   } catch (err) { next(err); }
 }
 
-/* -------- API: حفظ عنوان ونقاط كل متطلبات الذاتي الحالية -------- */
+/* -------- API: حفظ عنوان وكيلوات كل متطلبات الذاتي الحالية -------- */
 async function saveSelfTaskConfig(req, res, next) {
   try {
     const { configs } = req.body; // [{taskId, title, points}, ...]
@@ -372,7 +372,7 @@ async function addSelfTask(req, res, next) {
   } catch (err) { next(err); }
 }
 
-/* -------- API: حذف متطلب ذاتي (يخصم النقاط ممن أنجزه أولاً) -------- */
+/* -------- API: حذف متطلب ذاتي (يخصم الكيلوات ممن أنجزه أولاً) -------- */
 async function deleteSelfTask(req, res, next) {
   try {
     const taskId = Number(req.body.taskId);
@@ -430,7 +430,7 @@ async function setSelfAchievementStatus(req, res, next) {
   }
 }
 
-/* -------- API: تبديل ظهور النقاط لعامة الزوار -------- */
+/* -------- API: تبديل ظهور الكيلوات لعامة الزوار -------- */
 async function toggleScoresVisible(req, res, next) {
   try {
     const current = await getScoresVisible();
@@ -445,7 +445,7 @@ async function toggleScoresVisible(req, res, next) {
   }
 }
 
-/* -------- API: أرشفة نقاط الأسبوع الحالية ثم تصفير الذاتي (المبادرات لا تتأثر) -------- */
+/* -------- API: أرشفة كيلوات الأسبوع الحالية ثم تصفير الذاتي (المبادرات لا تتأثر) -------- */
 async function archiveWeekPoints(req, res, next) {
   try {
     const weekNumber = Number(req.body.weekNumber);
@@ -457,7 +457,7 @@ async function archiveWeekPoints(req, res, next) {
 
     await pool.query(
       "INSERT INTO activity_log (action) VALUES (?)",
-      [`أرشفة نقاط الأسبوع ${weekNumber} وتصفيرها لـ ${count} طالباً (بدون المبادرات)`]
+      [`أرشفة كيلوات الأسبوع ${weekNumber} وتصفيرها لـ ${count} طالباً (بدون المبادرات)`]
     );
 
     res.json({ success: true, count });
@@ -466,7 +466,7 @@ async function archiveWeekPoints(req, res, next) {
   }
 }
 
-/* -------- صفحة عرض أرشيف النقاط الأسبوعي -------- */
+/* -------- صفحة عرض أرشيف الكيلوات الأسبوعي -------- */
 async function showPointsArchive(req, res, next) {
   try {
     const weeks = await archiveModel.getArchivedWeekNumbers();
@@ -474,7 +474,7 @@ async function showPointsArchive(req, res, next) {
     const rows = weeks.length ? await archiveModel.getArchiveByWeek(selectedWeek) : [];
 
     res.render("points-archive", {
-      pageTitle: "أرشيف النقاط الأسبوعي",
+      pageTitle: "أرشيف الكيلوات الأسبوعي",
       activeNav: "supervisor",
       weeks,
       selectedWeek,

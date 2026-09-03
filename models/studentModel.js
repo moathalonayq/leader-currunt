@@ -8,7 +8,7 @@ const pool = require("../config/db");
 const { normalizeArabic } = require("../utils/arabicNormalize");
 const INITIATIVE_CATEGORIES = ["التقنية", "الأدبية", "الأصولية", "المهارية"];
 
-/* -------- جلب كل الطلاب مع اسم مجموعتهم وإجمالي نقاطهم -------- */
+/* -------- جلب كل الطلاب مع اسم مجموعتهم وإجمالي كيلواتهم -------- */
 async function getAllStudents() {
   const [rows] = await pool.query(`
     SELECT
@@ -80,7 +80,7 @@ async function getStudentById(id) {
   student.initiatives = initiativesRows;
   student.attendance = attendanceRows;
   student.initiatives_points = initiativesRows.reduce((sum, i) => sum + i.points, 0);
-  // إجمالي الملف الشخصي فقط يضم نقاط المبادرات (بخلاف إجمالي جدول المجموعة الذي يستثنيها)
+  // إجمالي الملف الشخصي فقط يضم كيلوات المبادرات (بخلاف إجمالي جدول المجموعة الذي يستثنيها)
   student.total_points = student.knowledge_points + student.attendance_points
     + student.initiatives_points;
 
@@ -146,7 +146,7 @@ async function getTopStudents(limit = 10) {
 
 /* -------- الترتيب العام للطالب بين كل طلاب النادي -------- */
 async function getStudentRankOverall(studentId) {
-  // الترتيب (بخلاف الإجمالي المعروض) يحتسب نقاط المبادرات أيضاً
+  // الترتيب (بخلاف الإجمالي المعروض) يحتسب كيلوات المبادرات أيضاً
   const [rows] = await pool.query(`
     SELECT s.id,
       (s.knowledge_points + s.attendance_points + COALESCE(s.cultural_points, 0) + COALESCE(s.sports_points, 0) + COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = s.id), 0)) AS total_points
@@ -159,7 +159,7 @@ async function getStudentRankOverall(studentId) {
 
 /* -------- ترتيب طالب داخل مجموعته فقط (تُستخدم في بوابة ولي الأمر) -------- */
 async function getStudentRankInGroup(studentId, groupId) {
-  // الترتيب (بخلاف الإجمالي المعروض) يحتسب نقاط المبادرات أيضاً
+  // الترتيب (بخلاف الإجمالي المعروض) يحتسب كيلوات المبادرات أيضاً
   const [rows] = await pool.query(`
     SELECT id, name,
       (knowledge_points + attendance_points + COALESCE(cultural_points, 0) + COALESCE(sports_points, 0) + COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = students.id), 0)) AS total_points
@@ -172,7 +172,7 @@ async function getStudentRankInGroup(studentId, groupId) {
   return { rank, groupSize: rows.length };
 }
 
-/* -------- إضافة (أو خصم) نقاط لطالب في برنامج معين -------- */
+/* -------- إضافة (أو خصم) كيلوات لطالب في برنامج معين -------- */
 async function addPointsToStudent(studentId, program, amount, category) {
   if (program === "initiative") {
     if (!INITIATIVE_CATEGORIES.includes(category)) {
@@ -189,7 +189,7 @@ async function addPointsToStudent(studentId, program, amount, category) {
   const column = { knowledge: "knowledge_points" }[program];
   if (!column) return { error: "برنامج غير معروف" };
 
-  // نمنع وصول النقاط لأقل من صفر عند الخصم
+  // نمنع وصول الكيلوات لأقل من صفر عند الخصم
   // GREATEST() متوفرة بنفس الاسم في MySQL أيضاً
   await pool.query(
     `UPDATE students SET ${column} = GREATEST(${column} + ?, 0) WHERE id = ?`,
@@ -199,8 +199,8 @@ async function addPointsToStudent(studentId, program, amount, category) {
 }
 
 /* -------- تسجيل حضور لجلسة محددة (يدوي من المشرف، تلقائي عبر الباركود، أو ذاتي من الطالب) --------
-   كل حضور "حاضر" أو "متأخر" يمنح 15 نقطة حضور. المنطق هنا يقارن الحالة
-   السابقة بالجديدة حتى لا تُضاف/تُخصم النقاط أكثر من مرة عند إعادة تسجيل
+   كل حضور "حاضر" أو "متأخر" يمنح 15 كيلو حضور. المنطق هنا يقارن الحالة
+   السابقة بالجديدة حتى لا تُضاف/تُخصم الكيلوات أكثر من مرة عند إعادة تسجيل
    نفس الحالة أو التبديل بين "حاضر" و"متأخر". */
 async function markAttendance(studentId, status, sessionId) {
   const [settingRows] = await pool.query("SELECT value FROM settings WHERE `key` = 'attendance_points'");
@@ -250,7 +250,7 @@ async function getAttendanceForSession(studentId, sessionId) {
 }
 
 /* -------- تأكيد/إلغاء إنجاز متطلب "ذاتي" معين لطالب --------
-   النقاط تُقرأ من weekly_self_tasks عند التأكيد وتبقى محفوظة في self_achievements
+   الكيلوات تُقرأ من weekly_self_tasks عند التأكيد وتبقى محفوظة في self_achievements
    حتى لو تغيّرت قيمة المتطلب لاحقاً في الإعدادات العامة */
 async function setSelfAchievementDone(studentId, taskId, done) {
   const [taskRows] = await pool.query(
@@ -267,7 +267,7 @@ async function setSelfAchievementDone(studentId, taskId, done) {
 
   if (done && !existing.length) {
     if (!task.points || task.points <= 0) {
-      return { error: "لا يمكن إنجاز هذا المتطلب لأن نقاطه صفرية من إعدادات الذاتي" };
+      return { error: "لا يمكن إنجاز هذا المتطلب لأن كيلواته صفرية من إعدادات الذاتي" };
     }
     const programStartDate = new Date("2026-09-10T00:00:00");
     const now = new Date();
@@ -309,7 +309,7 @@ async function addSelfTask(weekNumber, title, points) {
   return { id: result.insertId, week_number: weekNumber, title, points };
 }
 
-/* -------- حذف متطلب ذاتي، مع خصم النقاط ممن أنجزه من الطلاب أولاً -------- */
+/* -------- حذف متطلب ذاتي، مع خصم الكيلوات ممن أنجزه من الطلاب أولاً -------- */
 async function deleteSelfTask(taskId) {
   const conn = await pool.getConnection();
   try {

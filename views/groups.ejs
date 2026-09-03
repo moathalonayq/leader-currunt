@@ -56,7 +56,7 @@
             ? `<div class="group-summary-total">${g.total_points.toLocaleString('ar')}</div>`
             : '';
           const subText = scoresVisible
-            ? `${g.member_count} طالب • المتوسط: ${g.avg_points} نقطة`
+            ? `${g.member_count} طالب • المتوسط: ${g.avg_points} كيلو`
             : `${g.member_count} طالب`;
           return `
         <div class="group-summary-card ${medalClass}" onclick="showStudents(${g.id})">
@@ -109,7 +109,7 @@
           <div class="group-rank-badge">1</div>
           <div>
             <h3>${group.name}</h3>
-            <p class="group-sub">${group.member_count} طالب${scoresVisible ? ' • متوسط نقاط الطالب: ' + group.total_points : ''}</p>
+            <p class="group-sub">${group.member_count} طالب${scoresVisible ? ' • متوسط كيلوات الطالب: ' + group.total_points : ''}</p>
           </div>
         </div>
         <table class="group-table">

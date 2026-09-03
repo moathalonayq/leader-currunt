@@ -1,7 +1,7 @@
 /* =========================================================
    public/js/supervisor.js
    منطق لوحة المشرفين:
-   - إضافة / خصم نقاط (AJAX)
+   - إضافة / خصم كيلوات (AJAX)
    - قائمة الحضور بالجملة حسب الأسر (AJAX)
    - عرض/طباعة باركود QR لكل طالب
    ========================================================= */
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         const data = await res.json();
         if (data.success) {
-          alert("تم تحديث النقاط بنجاح!");
+          alert("تم تحديث الكيلوات بنجاح!");
           window.location.reload();
         } else {
           alert(data.error || "حدث خطأ");
@@ -360,7 +360,7 @@ function attachAttendanceRowHandlers(sessionSelect) {
 }
 
 /* =========================================================
-   زر إخفاء / إظهار أعمدة النقاط في جدول المشرف فقط
+   زر إخفاء / إظهار أعمدة الكيلوات في جدول المشرف فقط
    ========================================================= */
 function setupToggleScores() {
   const btn = document.getElementById("toggleScoresBtn");
@@ -371,12 +371,12 @@ function setupToggleScores() {
     document.querySelectorAll(".col-scores").forEach(el => {
       el.style.display = hidden ? "none" : "";
     });
-    btn.textContent = hidden ? "إظهار النقاط" : "إخفاء النقاط";
+    btn.textContent = hidden ? "إظهار الكيلوات" : "إخفاء الكيلوات";
   });
 }
 
 /* =========================================================
-   زر إخفاء / إظهار النقاط عالمياً لجميع الزوار
+   زر إخفاء / إظهار الكيلوات عالمياً لجميع الزوار
    ========================================================= */
 const SCORES_PIN = "135";
 
@@ -405,10 +405,10 @@ function setupGlobalToggleScores() {
       const visible = data.scoresVisible;
       statusText.textContent = visible ? "ظاهرة ✅" : "مخفية 🔒";
       statusText.className = "scores-status-badge " + (visible ? "badge-visible" : "badge-hidden");
-      btn.textContent = visible ? "🔒 إخفاء النقاط" : "✅ إظهار النقاط";
+      btn.textContent = visible ? "🔒 إخفاء الكيلوات" : "✅ إظهار الكيلوات";
       btn.className = "btn " + (visible ? "btn-danger-outline" : "btn-primary");
       msg.style.color = "#16a34a";
-      msg.textContent = visible ? "✅ تم إظهار النقاط للزوار" : "🔒 تم إخفاء النقاط عن الزوار";
+      msg.textContent = visible ? "✅ تم إظهار الكيلوات للزوار" : "🔒 تم إخفاء الكيلوات عن الزوار";
       if (pinInput) pinInput.value = "";
       setTimeout(() => { msg.textContent = ""; msg.style.color = ""; }, 3000);
     } catch {
@@ -429,7 +429,7 @@ function setupGlobalToggleScores() {
 
 /* =========================================================
    0) قائمة بحث سريعة بالكتابة لاختيار الطالب
-   تُستخدم بدل القائمة المنسدلة الطويلة في نموذجي النقاط والحضور
+   تُستخدم بدل القائمة المنسدلة الطويلة في نموذجي الكيلوات والحضور
    ========================================================= */
 function setupStudentSearchSelects() {
   const dataEl = document.getElementById("studentsDataJson");
@@ -571,7 +571,7 @@ function setupStudentSearchSelect(inputId, resultsId, hiddenId, students, onSele
 }
 
 /* =========================================================
-   1) تسجيل مبادرة (إضافة / خصم نقاط بأحد المحاور الأربعة)
+   1) تسجيل مبادرة (إضافة / خصم كيلوات بأحد المحاور الأربعة)
    ========================================================= */
 
 /* =========================================================
@@ -606,7 +606,7 @@ function setupCatPointsForm() {
       const data = await res.json();
 
       if (data.success) {
-        showMsg(msg, "تم تحديث النقاط بنجاح!", "success");
+        showMsg(msg, "تم تحديث الكيلوات بنجاح!", "success");
         setTimeout(() => window.location.reload(), 1000);
       } else {
         showMsg(msg, data.error || "حدث خطأ غير معروف", "error");
@@ -644,7 +644,7 @@ function setupPointsForm() {
       return;
     }
     if (!amount || amount <= 0) {
-      showMsg(msg, "أدخل عدد نقاط صحيح", "error");
+      showMsg(msg, "أدخل عدد كيلوات صحيح", "error");
       return;
     }
 
@@ -667,7 +667,7 @@ function setupPointsForm() {
 
       const actionLabel = mode === "subtract" ? "خصم" : "تسجيل";
       msg.className = "form-msg success";
-      msg.innerHTML = `تم ${actionLabel} ${amount} نقطة (${reason}) لـ ${studentName} بنجاح ✅ <button type="button" class="btn-undo-points">↩️ تراجع</button>`;
+      msg.innerHTML = `تم ${actionLabel} ${amount} كيلو (${reason}) لـ ${studentName} بنجاح ✅ <button type="button" class="btn-undo-points">↩️ تراجع</button>`;
       document.getElementById("initiativeAmount").value = "";
 
       const undoBtn = msg.querySelector(".btn-undo-points");
@@ -723,7 +723,7 @@ async function loadTaskConfig() {
             placeholder="عنوان المتطلب" value="${t.title}">
           <input type="number" class="task-config-input" data-task-id="${t.id}"
             min="1" placeholder="0" value="${t.points > 0 ? t.points : ""}">
-          <span class="task-points-label">نقطة</span>
+          <span class="task-points-label">كيلو</span>
           <button type="button" class="btn-delete-task" data-task-id="${t.id}" title="حذف المتطلب">🗑️</button>
         </div>
       `).join("")}
@@ -754,14 +754,14 @@ async function addTask() {
       showMsg(msg, data.message || "حدث خطأ", "error");
       return;
     }
-    showMsg(msg, "تمت إضافة متطلب جديد، عدّل عنوانه ونقاطه ثم احفظ ✅", "success");
+    showMsg(msg, "تمت إضافة متطلب جديد، عدّل عنوانه وكيلواته ثم احفظ ✅", "success");
     loadTaskConfig();
   } catch (e) {
     showMsg(msg, "حدث خطأ في الاتصال", "error");
   }
 }
 
-/* حذف متطلب (يخصم النقاط ممن أنجزه أولاً) */
+/* حذف متطلب (يخصم الكيلوات ممن أنجزه أولاً) */
 async function deleteTask(taskId) {
   const msg = document.getElementById("taskConfigMsg");
   if (!confirm("هل تريد حذف هذا المتطلب؟ سيُخصَم من كل طالب أنجزه.")) return;
@@ -784,7 +784,7 @@ async function deleteTask(taskId) {
   }
 }
 
-/* حفظ عنوان ونقاط كل متطلبات الذاتي الحالية */
+/* حفظ عنوان وكيلوات كل متطلبات الذاتي الحالية */
 async function saveTaskConfig() {
   const titleInputs = document.querySelectorAll(".task-config-title-input");
   const saveBtn = document.getElementById("saveTaskConfigBtn");
@@ -801,7 +801,7 @@ async function saveTaskConfig() {
   });
 
   if (configs.some((c) => c.points <= 0 || !c.title)) {
-    showMsg(msg, "أدخل عنواناً ونقاطاً لكل متطلب", "error");
+    showMsg(msg, "أدخل عنواناً وكيلواتاً لكل متطلب", "error");
     return;
   }
 
@@ -855,7 +855,7 @@ async function loadKnowledgeTasks(studentId) {
         <div class="task-toggle-item">
           <input type="checkbox" class="task-toggle-checkbox" data-task-id="${t.task_id}" ${t.done ? "checked" : ""}>
           <span class="task-toggle-title">${t.title}</span>
-          ${t.done && t.points ? `<span class="task-done-points">${t.points} نقطة</span>` : ""}
+          ${t.done && t.points ? `<span class="task-done-points">${t.points} كيلو</span>` : ""}
         </div>
       `).join("")}
     `).join("");
@@ -878,7 +878,7 @@ async function loadKnowledgeTasks(studentId) {
           } else {
             const a = data.achievement;
             const action = done ? "تم إنجاز" : "تم إلغاء إنجاز";
-            showMsg(msg, action + " [" + a.title + "]" + (done && a.points ? " (+" + a.points + " نقطة) ✅" : " ✅"), "success");
+            showMsg(msg, action + " [" + a.title + "]" + (done && a.points ? " (+" + a.points + " كيلو) ✅" : " ✅"), "success");
             loadKnowledgeTasks(studentId);
           }
         } catch (err) {
@@ -904,7 +904,7 @@ function showMsg(el, text, type) {
 }
 
 /* =========================================================
-   مساعد: تحديث صف الطالب في الجدول بعد تعديل نقاطه
+   مساعد: تحديث صف الطالب في الجدول بعد تعديل كيلواته
    ========================================================= */
 function updateStudentRowInTable(student) {
   const row = document.querySelector(`tr[data-student-id="${student.id}"]`);

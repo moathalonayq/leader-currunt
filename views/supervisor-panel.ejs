@@ -7,7 +7,7 @@
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <a href="/daily-attendance" class="btn btn-outline btn-small">📋 التحضير اليومي</a>
         <a href="/supervisor/weekly-reminders" class="btn btn-gold btn-small">📤 تذكير نهاية الأسبوع</a>
-        <a href="/supervisor/points-archive" class="btn btn-gold btn-small">🗄️ أرشيف النقاط</a>
+        <a href="/supervisor/points-archive" class="btn btn-gold btn-small">🗄️ أرشيف الكيلوات</a>
         <form method="POST" action="/supervisor/logout">
           <button type="submit" class="btn btn-outline btn-small">تسجيل الخروج</button>
         </form>
@@ -56,9 +56,9 @@
     <script type="application/json" id="attendanceGroupsDataJson"><%- JSON.stringify(allGroups) %></script>
 
     <!-- =========================================================
-         2) النقاط: إضافة/خصم + إنجاز الذاتي الأسبوعي
+         2) الكيلوات: إضافة/خصم + إنجاز الذاتي الأسبوعي
          ========================================================= -->
-    <h3 class="panel-group-title">🏆 النقاط</h3>
+    <h3 class="panel-group-title">🏆 الكيلوات</h3>
 
     <div class="panel-grid" style="margin-bottom:18px;">
       <!-- تسجيل مبادرة -->
@@ -88,9 +88,9 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="initiativeAmount">عدد النقاط</label>
+            <label for="initiativeAmount">عدد الكيلوات</label>
             <select id="initiativeAmount" class="form-select">
-              <option value="">اختر عدد النقاط</option>
+              <option value="">اختر عدد الكيلوات</option>
               <option value="5">5</option>
               <option value="10">10</option>
               <option value="15">15</option>
@@ -105,7 +105,7 @@
           <div class="form-group" style="display:flex; gap:10px;">
             <button type="button" id="addInitiativeBtn" class="btn btn-gold" style="flex:1;">تسجيل المبادرة</button>
             <button type="button" id="subtractInitiativeBtn" class="btn btn-danger-outline" style="flex:1;">خصم
-              النقاط</button>
+              الكيلوات</button>
           </div>
           <p class="form-msg" id="initiativeMsg"></p>
         </form>
@@ -137,7 +137,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="catPointsAmount">عدد النقاط</label>
+            <label for="catPointsAmount">عدد الكيلوات</label>
             <select id="catPointsAmount" class="form-select">
               <option value="-40">-40 (خصم)</option>
               <option value="-35">-35 (خصم)</option>
@@ -158,7 +158,7 @@
               <option value="40">40</option>
             </select>
           </div>
-          <button type="button" id="updateCatPointsBtn" class="btn btn-gold" style="width:100%;">تحديث النقاط</button>
+          <button type="button" id="updateCatPointsBtn" class="btn btn-gold" style="width:100%;">تحديث الكيلوات</button>
           <p class="form-msg" id="catPointsMsg"></p>
         </form>
       </div>
@@ -187,20 +187,20 @@
       <!-- إعدادات الحضور -->
       <div class="panel-box" style="margin-bottom:18px;">
         <h4 style="margin-top:0;">إعدادات الحضور</h4>
-        <p class="section-desc" style="margin-bottom:12px; font-size:13px;">تحديد عدد النقاط المكتسبة عند الحضور ليوم واحد</p>
+        <p class="section-desc" style="margin-bottom:12px; font-size:13px;">تحديد عدد الكيلوات المكتسبة عند الحضور ليوم واحد</p>
         <form id="attendancePointsForm" style="display:flex; gap:10px; align-items:flex-end;">
           <div class="form-group" style="margin-bottom:0;">
-            <label>عدد النقاط للحضور</label>
+            <label>عدد الكيلوات للحضور</label>
             <input type="number" id="attendancePointsInput" class="form-input" style="width:120px;" value="<%= attendancePointsValue %>" min="0">
           </div>
           <button type="submit" class="btn btn-primary">حفظ الإعدادات</button>
         </form>
       </div>
 
-      <!-- إعداد متطلبات الذاتي لكل أسبوع (متطلبان أو ثلاثة، وعدد نقاط كل متطلب) -->
+      <!-- إعداد متطلبات الذاتي لكل أسبوع (متطلبان أو ثلاثة، وعدد كيلوات كل متطلب) -->
       <div class="panel-box" style="margin-bottom:18px;">
         <h4 style="margin-top:0;">⚙️ ضبط الذاتي الأسبوعي (16 أسبوعاً)</h4>
-        <p class="section-desc" style="margin-bottom:12px; font-size:13px;">لكل أسبوع متطلبان أو ثلاثة، بعنوان ونقاط
+        <p class="section-desc" style="margin-bottom:12px; font-size:13px;">لكل أسبوع متطلبان أو ثلاثة، بعنوان وكيلوات
           مستقلة لكل متطلب — أضف أو احذف متطلبات أي أسبوع بحرية</p>
         <div class="form-group" style="display:flex; gap:10px; align-items:flex-end; margin-bottom:14px;">
           <div style="flex:1;">
@@ -334,7 +334,7 @@
 
           <div class="scores-visibility-box" style="margin-bottom:18px;">
             <div class="scores-status-info">
-              <strong>حالة نقاط الطلاب للزوار:</strong>
+              <strong>حالة كيلوات الطلاب للزوار:</strong>
               <span id="scoresStatusText"
                 class="scores-status-badge <%= scoresVisible ? 'badge-visible' : 'badge-hidden' %>">
                 <%= scoresVisible ? 'ظاهرة ✅' : 'مخفية 🔒' %>
@@ -346,7 +346,7 @@
                 maxlength="6" autocomplete="off">
               <button type="button" id="globalToggleScoresBtn"
                 class="btn <%= scoresVisible ? 'btn-danger-outline' : 'btn-primary' %>">
-                <%= scoresVisible ? '🔒 إخفاء النقاط' : '✅ إظهار النقاط' %>
+                <%= scoresVisible ? '🔒 إخفاء الكيلوات' : '✅ إظهار الكيلوات' %>
               </button>
             </div>
             <p class="form-msg" id="scoresToggleMsg" style="margin:0;"></p>

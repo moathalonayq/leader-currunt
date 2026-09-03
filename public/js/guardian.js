@@ -300,12 +300,12 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
 
-        <!-- بطاقات ملخص النقاط -->
+        <!-- بطاقات ملخص الكيلوات -->
         <div class="profile-summary-cards">
           ${scoresVisible ? `
           <div class="summary-card summary-total">
             <div class="summary-value">${student.total_points}</div>
-            <div class="summary-label">إجمالي النقاط</div>
+            <div class="summary-label">إجمالي الكيلوات</div>
           </div>` : ''}
           <div class="summary-card summary-att">
             <div class="summary-value ${att.rate >= 75 ? 'text-success' : att.rate >= 50 ? 'text-warning' : 'text-danger'}">${att.rate}%</div>
@@ -317,17 +317,17 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
 
-        <!-- تفاصيل النقاط مع أشرطة تقدم -->
+        <!-- تفاصيل الكيلوات مع أشرطة تقدم -->
         ${scoresVisible ? `
         <div class="section-block">
-          <h4>📊 تفاصيل النقاط</h4>
+          <h4>📊 تفاصيل الكيلوات</h4>
           <div class="points-detail-list">
             <div class="points-detail-row">
               <span class="pd-label">📘 البرنامج الذاتي</span>
               <span class="pd-value knowledge-color">${student.knowledge_points}</span>
             </div>
             <div class="points-detail-row">
-              <span class="pd-label">🎟️ نقاط الحضور</span>
+              <span class="pd-label">🎟️ كيلوات الحضور</span>
               <span class="pd-value">${student.attendance_points}</span>
             </div>
           </div>
@@ -406,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
               ${student.initiatives.map(i => `
                 <li>
                   <span>${i.category}</span>
-                  <span class="initiative-points ${i.points < 0 ? 'initiative-negative' : ''}">${i.points >= 0 ? "+" : ""}${i.points} نقطة</span>
+                  <span class="initiative-points ${i.points < 0 ? 'initiative-negative' : ''}">${i.points >= 0 ? "+" : ""}${i.points} كيلو</span>
                   <span class="initiative-date">${formatDateArabic(i.created_at)}</span>
                 </li>
               `).join("")}

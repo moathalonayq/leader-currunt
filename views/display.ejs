@@ -182,7 +182,7 @@
       <div class="stat-display-card">
         <span class="sdc-icon">🟦</span>
         <span class="sdc-value" id="statKnowledge"><%= stats.totalKnowledge %></span>
-        <span class="sdc-label">نقاط الذاتي</span>
+        <span class="sdc-label">كيلوات الذاتي</span>
       </div>
     </div>
     <div class="session-banner" id="sessionBanner">⏳ جارٍ تحميل الجلسة...</div>
@@ -208,7 +208,7 @@
   updateClock();
   setInterval(updateClock, 1000);
 
-  /* ======= نقاط المؤشر ======= */
+  /* ======= كيلوات المؤشر ======= */
   const dotsEl = document.getElementById('slideDots');
   for (let i = 0; i < SLIDE_COUNT; i++) {
     const d = document.createElement('div');
