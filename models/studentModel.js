@@ -117,7 +117,7 @@ async function searchStudentsByName(query) {
 
   const matched = rows
     .map((s) => {
-      const wordIndex = s.name_normalized.indexOf(normalized);
+      const wordIndex = s.name_normalized ? s.name_normalized.indexOf(normalized) : -1;
       return { ...s, wordIndex };
     })
     .filter((s) => s.wordIndex !== -1)
@@ -273,12 +273,12 @@ async function setSelfAchievementDone(studentId, taskId, done) {
     // Calculate the current week number (Week 1 starts on Sep 10, Week 2 on Sep 17, etc.)
     const diffTime = Math.max(0, now.getTime() - programStartDate.getTime());
     const currentWeekNumber = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000)) + 1;
-    
+
     let awardedPoints = task.points;
     if (task.week_number < currentWeekNumber) {
       awardedPoints = Math.round(task.points / 2);
     }
-    
+
     await pool.query(
       "INSERT INTO self_achievements (student_id, task_id, points) VALUES (?, ?, ?)",
       [studentId, taskId, awardedPoints]
@@ -299,7 +299,7 @@ async function setSelfAchievementDone(studentId, taskId, done) {
   return task;
 }
 
-  /* -------- إضافة متطلب ذاتي جديد لأسبوع معين -------- */
+/* -------- إضافة متطلب ذاتي جديد لأسبوع معين -------- */
 async function addSelfTask(weekNumber, title, points) {
   const [result] = await pool.query(
     "INSERT INTO weekly_self_tasks (week_number, title, points) VALUES (?, ?, ?)",
