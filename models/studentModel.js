@@ -117,8 +117,7 @@ async function searchStudentsByName(query) {
 
   const matched = rows
     .map((s) => {
-      const words = s.name_normalized.split(/\s+/);
-      const wordIndex = words.findIndex((w) => w.startsWith(normalized));
+      const wordIndex = s.name_normalized.indexOf(normalized);
       return { ...s, wordIndex };
     })
     .filter((s) => s.wordIndex !== -1)
