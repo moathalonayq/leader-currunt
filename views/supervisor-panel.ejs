@@ -184,6 +184,19 @@
     </div>
 
     <% if (role==='admin' ) { %>
+      <!-- إعدادات الحضور -->
+      <div class="panel-box" style="margin-bottom:18px;">
+        <h4 style="margin-top:0;">إعدادات الحضور</h4>
+        <p class="section-desc" style="margin-bottom:12px; font-size:13px;">تحديد عدد النقاط المكتسبة عند الحضور ليوم واحد</p>
+        <form id="attendancePointsForm" style="display:flex; gap:10px; align-items:flex-end;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label>عدد النقاط للحضور</label>
+            <input type="number" id="attendancePointsInput" class="form-input" style="width:120px;" value="<%= attendancePointsValue %>" min="0">
+          </div>
+          <button type="submit" class="btn btn-primary">حفظ الإعدادات</button>
+        </form>
+      </div>
+
       <!-- إعداد متطلبات الذاتي لكل أسبوع (متطلبان أو ثلاثة، وعدد نقاط كل متطلب) -->
       <div class="panel-box" style="margin-bottom:18px;">
         <h4 style="margin-top:0;">⚙️ ضبط الذاتي الأسبوعي (16 أسبوعاً)</h4>

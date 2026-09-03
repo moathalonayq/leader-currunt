@@ -203,7 +203,8 @@ async function addPointsToStudent(studentId, program, amount, category) {
    السابقة بالجديدة حتى لا تُضاف/تُخصم النقاط أكثر من مرة عند إعادة تسجيل
    نفس الحالة أو التبديل بين "حاضر" و"متأخر". */
 async function markAttendance(studentId, status, sessionId) {
-  const ATTENDANCE_POINTS = 15;
+  const [settingRows] = await pool.query("SELECT value FROM settings WHERE `key` = 'attendance_points'");
+  const ATTENDANCE_POINTS = settingRows.length > 0 ? parseInt(settingRows[0].value, 10) || 15 : 15;
   const PRESENT_STATUSES = ["حاضر", "متأخر"];
 
   const [prevRows] = await pool.query(

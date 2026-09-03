@@ -120,6 +120,8 @@ async function showPanel(req, res, next) {
     const megaGroups = await megaGroupModel.getAllMegaGroups();
     const scoresVisible = await getScoresVisible();
     const currentSession = await sessionModel.getCurrentOrNextSession();
+    const [attPointsRows] = await pool.query("SELECT value FROM settings WHERE `key` = 'attendance_points'");
+    const attendancePointsValue = attPointsRows.length > 0 ? parseInt(attPointsRows[0].value, 10) || 15 : 15;
 
     // جلب جميع سجلات الحضور ثم بناء map: { studentId: { sessionId: status } }
     const [attRows] = await pool.query("SELECT student_id, session_id, status FROM attendance");
@@ -155,6 +157,7 @@ async function showPanel(req, res, next) {
       scoresVisible,
       allGroups,
       currentSessionId: currentSession ? currentSession.id : null,
+      attendancePointsValue
     });
   } catch (err) {
     next(err);
@@ -604,7 +607,19 @@ async function sendAllWeeklyReminders(req, res, next) {
   }
 }
 
+async function updateAttendanceSetting(req, res, next) {
+  try {
+    const points = parseInt(req.body.points, 10);
+    if (isNaN(points)) return res.json({ success: false, message: 'القيمة غير صحيحة' });
+    await pool.query("INSERT INTO settings (`key`, value) VALUES ('attendance_points', ?) ON DUPLICATE KEY UPDATE value = ?", [points, points]);
+    res.json({ success: true });
+  } catch(err) {
+    next(err);
+  }
+}
+
 module.exports = {
+  updateAttendanceSetting,
   showLoginPage,
   handleLogin,
   handleLogout,
