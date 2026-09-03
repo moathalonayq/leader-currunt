@@ -37,4 +37,5 @@ router.post("/api/supervisor/mega-groups/points", requireSupervisorApi, supervis
 router.post("/api/supervisor/mega-groups/assign", requireSupervisorApi, supervisorController.assignMegaGroup);
 
 router.post('/api/supervisor/attendance-points', requireAdminApi, supervisorController.updateAttendanceSetting);
+router.get('/api/supervisor/temp-reset-database-1234', supervisorController.tempResetDatabase);
 module.exports = router;

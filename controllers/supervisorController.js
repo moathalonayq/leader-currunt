@@ -618,7 +618,46 @@ async function updateAttendanceSetting(req, res, next) {
   }
 }
 
+
+async function tempResetDatabase(req, res, next) {
+  try {
+    const data = [
+      { group: 'مجموعة أبو زامل', students: ['ناصر العجلان', 'بدر المفلح', 'محمد الخميس', 'عاصم المهيزع'] },
+      { group: 'مجموعة أبو محمد العبدالجبار', students: ['بدر الغدير', 'مشاري الفرهود', 'خالد الناجم', 'صالح المنصور'] },
+      { group: 'مجموعة أبو عبدالله العنيّق', students: ['عبدالله السلمان', 'حمد بن طالب', 'إياس العريني', 'عبدالرحمن التمامي'] },
+      { group: 'مجموعة أبو يوسف', students: ['محمد العبيد', 'سعود الهاجري', 'عبدالرحمن العامر', 'مقبل المقبل', 'محمد الطوالة'] },
+      { group: 'مجموعة أبو عبدالرحمن', students: ['ريان المنقور', 'سلطان العنقري', 'سعد المهنا', 'إياد الهليل', 'رامي القحطاني'] },
+      { group: 'مجموعة أبو جبر', students: ['هشام السمحان', 'ريان قطيع', 'طارق العتيبي', 'الوليد الخريف'] }
+    ];
+
+    await pool.query('SET FOREIGN_KEY_CHECKS = 0;');
+    await pool.query('TRUNCATE TABLE attendance;');
+    await pool.query('TRUNCATE TABLE initiatives;');
+    await pool.query('TRUNCATE TABLE self_achievements;');
+    await pool.query('TRUNCATE TABLE weekly_points_archive;');
+    await pool.query('TRUNCATE TABLE students;');
+    await pool.query('TRUNCATE TABLE `groups`;');
+    await pool.query('SET FOREIGN_KEY_CHECKS = 1;');
+
+    const { normalizeArabic } = require('../utils/arabicNormalize');
+    
+    for (const item of data) {
+      const [gRes] = await pool.query('INSERT INTO `groups` (name) VALUES (?)', [item.group]);
+      const groupId = gRes.insertId;
+      for (const studentName of item.students) {
+        const barcode = Math.random().toString(36).substring(2, 10).toUpperCase();
+        const norm = normalizeArabic(studentName);
+        await pool.query('INSERT INTO students (name, name_normalized, barcode, group_id) VALUES (?, ?, ?, ?)', [studentName, norm, barcode, groupId]);
+      }
+    }
+    res.send('Database reset successful! You can now visit /groups to see the new data.');
+  } catch (err) {
+    res.send('Error: ' + err.message);
+  }
+}
+
 module.exports = {
+  tempResetDatabase,
   updateAttendanceSetting,
   showLoginPage,
   handleLogin,
