@@ -174,9 +174,7 @@ app.use((err, req, res, next) => {
   res.status(500).render("error", {
     pageTitle: "حدث خطأ",
     activeNav: "",
-    message: process.env.NODE_ENV === "production"
-      ? "حدث خطأ غير متوقع، حاول مرة أخرى لاحقاً"
-      : err.message,
+    message: err.stack || err.message,
   });
 });
 
