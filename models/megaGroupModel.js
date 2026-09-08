@@ -63,7 +63,23 @@ const getMegaGroupDetails = async () => {
   return mgs;
 };
 
+
+const createMegaGroup = async (name) => {
+  await pool.query('INSERT INTO mega_groups (name) VALUES (?)', [name]);
+};
+
+const deleteMegaGroup = async (id) => {
+  await pool.query('DELETE FROM mega_groups WHERE id = ?', [id]);
+};
+
+const renameMegaGroup = async (id, newName) => {
+  await pool.query('UPDATE mega_groups SET name = ? WHERE id = ?', [newName, id]);
+};
+
 module.exports = {
+  createMegaGroup,
+  deleteMegaGroup,
+  renameMegaGroup,
   assignGroupToMegaGroup,
   getMegaGroupDetails,
   getAllMegaGroups,

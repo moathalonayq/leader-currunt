@@ -656,7 +656,38 @@ async function tempResetDatabase(req, res, next) {
   }
 }
 
+
+async function manageMegaGroups(req, res, next) {
+  try {
+    const { action, id, name } = req.body;
+    
+    if (action === 'create') {
+      if (!name || name.trim() === '') return res.json({ success: false, message: 'الاسم مطلوب' });
+      await megaGroupModel.createMegaGroup(name.trim());
+      return res.json({ success: true, message: 'تم إضافة المجموعة بنجاح' });
+    } 
+    else if (action === 'rename') {
+      if (!id || !name || name.trim() === '') return res.json({ success: false, message: 'الاسم مطلوب' });
+      await megaGroupModel.renameMegaGroup(id, name.trim());
+      return res.json({ success: true, message: 'تم تغيير الاسم بنجاح' });
+    }
+    else if (action === 'delete') {
+      if (!id) return res.json({ success: false, message: 'المعرّف مطلوب' });
+      await megaGroupModel.deleteMegaGroup(id);
+      return res.json({ success: true, message: 'تم حذف المجموعة بنجاح' });
+    }
+    
+    return res.json({ success: false, message: 'إجراء غير معروف' });
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.json({ success: false, message: 'اسم المجموعة موجود مسبقاً' });
+    }
+    next(err);
+  }
+}
+
 module.exports = {
+  manageMegaGroups,
   tempResetDatabase,
   updateAttendanceSetting,
   showLoginPage,

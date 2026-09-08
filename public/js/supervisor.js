@@ -1028,3 +1028,70 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Add mega group
+  const addMegaGroupForm = document.getElementById('addMegaGroupForm');
+  if (addMegaGroupForm) {
+    addMegaGroupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('newMegaGroupName').value;
+      try {
+        const res = await fetch('/api/supervisor/mega-groups/manage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'create', name })
+        });
+        const data = await res.json();
+        alert(data.message);
+        if (data.success) location.reload();
+      } catch(err) {
+        alert('حدث خطأ في الاتصال');
+      }
+    });
+  }
+
+  // Rename mega group
+  document.querySelectorAll('.btn-rename-mega').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const input = document.querySelector(`.mega-group-rename-input[data-id="${id}"]`);
+      const name = input.value;
+      try {
+        const res = await fetch('/api/supervisor/mega-groups/manage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'rename', id, name })
+        });
+        const data = await res.json();
+        alert(data.message);
+        if (data.success) location.reload();
+      } catch(err) {
+        alert('حدث خطأ في الاتصال');
+      }
+    });
+  });
+
+  // Delete mega group
+  document.querySelectorAll('.btn-delete-mega').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const name = btn.dataset.name;
+      if (!confirm(`هل أنت متأكد من حذف المجموعة الكبرى "${name}"؟\nسيتم إزالة ربطها من جميع الأسر المرتبطة بها ولن تحذف الأسر نفسها.`)) return;
+      
+      try {
+        const res = await fetch('/api/supervisor/mega-groups/manage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete', id })
+        });
+        const data = await res.json();
+        alert(data.message);
+        if (data.success) location.reload();
+      } catch(err) {
+        alert('حدث خطأ في الاتصال');
+      }
+    });
+  });
+});
