@@ -1002,3 +1002,29 @@ function printSingleBarcode(student) {
   };
   win.document.body.appendChild(script);
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const attendancePointsForm = document.getElementById("attendancePointsForm");
+  if (attendancePointsForm) {
+    attendancePointsForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const points = document.getElementById("attendancePointsInput").value;
+      try {
+        const res = await fetch("/api/supervisor/attendance-points", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ points })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("تم حفظ إعدادات الحضور بنجاح");
+        } else {
+          alert(data.message || "حدث خطأ");
+        }
+      } catch (err) {
+        alert("حدث خطأ في الاتصال");
+      }
+    });
+  }
+});
