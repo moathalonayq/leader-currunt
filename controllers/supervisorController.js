@@ -611,7 +611,11 @@ async function updateAttendanceSetting(req, res, next) {
   try {
     const points = parseInt(req.body.points, 10);
     if (isNaN(points)) return res.json({ success: false, message: 'القيمة غير صحيحة' });
-    await pool.query("INSERT INTO settings (`key`, value) VALUES ('attendance_points', ?) ON DUPLICATE KEY UPDATE value = ?", [points, points]);
+    
+      // Delete old to avoid duplicate key issues if PK is missing
+      await pool.query("DELETE FROM settings WHERE `key` = 'attendance_points'");
+      await pool.query("INSERT INTO settings (`key`, value) VALUES ('attendance_points', ?)", [points]);
+  
     res.json({ success: true });
   } catch(err) {
     next(err);
