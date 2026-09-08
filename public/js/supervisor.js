@@ -283,6 +283,7 @@ function setupAttendanceListByFamily() {
   const allGroups = JSON.parse(dataEl.textContent);
 
   window.showFamilyAttendance = function (index) {
+    window.currentGroupIndex = index;
     const group = allGroups[index];
 
     document.getElementById("familyPickerLevel").classList.add("hidden");
@@ -304,6 +305,52 @@ function setupAttendanceListByFamily() {
     attachAttendanceRowHandlers(sessionSelect, group);
     refreshAttendanceButtonStates(sessionSelect);
   };
+
+  
+  // Mark all present button
+  const markAllPresentBtn = document.getElementById('markAllPresentBtn');
+  if (markAllPresentBtn) {
+    markAllPresentBtn.addEventListener('click', async () => {
+      const sessionSelect = document.getElementById("attListSessionSelect");
+      const sessionId = sessionSelect.value;
+      if (typeof window.currentGroupIndex === 'undefined') return;
+      const group = allGroups[window.currentGroupIndex];
+      
+      markAllPresentBtn.disabled = true;
+      markAllPresentBtn.textContent = 'جاري التحضير...';
+
+      try {
+        for (const m of group.members) {
+           if (m.attendance && m.attendance[sessionId] === 'حاضر') continue;
+
+           const res = await fetch("/api/supervisor/attendance", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ studentId: m.id, sessionId, status: "حاضر" }),
+           });
+           const data = await res.json();
+           if (data.success) {
+              m.attendance = m.attendance || {};
+              m.attendance[sessionId] = 'حاضر';
+              
+              const row = document.querySelector(`.attendance-row[data-student-id="${m.id}"]`);
+              if (row) {
+                 row.dataset.attendance = JSON.stringify(m.attendance);
+                 row.querySelectorAll(".att-btn").forEach((b) => {
+                   b.classList.toggle("active", b.dataset.status === "حاضر");
+                 });
+              }
+           }
+        }
+      } catch (err) {
+        alert('حدث خطأ أثناء تحضير الجميع');
+      } finally {
+        markAllPresentBtn.disabled = false;
+        markAllPresentBtn.textContent = '✅ تحضير الجميع';
+      }
+    });
+  }
+
 
   window.backToFamilyPicker = function () {
     document.getElementById("familyDetailLevel").classList.add("hidden");
