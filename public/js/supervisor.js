@@ -301,7 +301,7 @@ function setupAttendanceListByFamily() {
       </div>
     `).join("");
 
-    attachAttendanceRowHandlers(sessionSelect);
+    attachAttendanceRowHandlers(sessionSelect, group);
     refreshAttendanceButtonStates(sessionSelect);
   };
 
@@ -324,7 +324,7 @@ function refreshAttendanceButtonStates(sessionSelect) {
   });
 }
 
-function attachAttendanceRowHandlers(sessionSelect) {
+function attachAttendanceRowHandlers(sessionSelect, group) {
   document.querySelectorAll("#familyDetailBody .attendance-row").forEach((row) => {
     row.querySelectorAll(".att-btn").forEach((btn) => {
       btn.addEventListener("click", async () => {
@@ -345,6 +345,13 @@ function attachAttendanceRowHandlers(sessionSelect) {
           const attendance = JSON.parse(row.dataset.attendance || "{}");
           attendance[sessionId] = status;
           row.dataset.attendance = JSON.stringify(attendance);
+          if (typeof group !== 'undefined' && group && group.members) {
+            const student = group.members.find(m => m.id == studentId);
+            if (student) {
+              student.attendance = student.attendance || {};
+              student.attendance[sessionId] = status;
+            }
+          }
 
           row.querySelectorAll(".att-btn").forEach((b) => {
             b.classList.toggle("active", b.dataset.status === status);
