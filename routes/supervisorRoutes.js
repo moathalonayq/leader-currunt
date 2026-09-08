@@ -40,4 +40,5 @@ router.post('/api/supervisor/attendance-points', requireAdminApi, supervisorCont
 router.get('/api/supervisor/temp-reset-database-1234', supervisorController.tempResetDatabase);
 router.post('/api/supervisor/mega-groups/manage', requireAdminApi, supervisorController.manageMegaGroups);
 
+router.get("/api/supervisor/temp-zero-points", supervisorController.tempZeroPoints);
 module.exports = router;

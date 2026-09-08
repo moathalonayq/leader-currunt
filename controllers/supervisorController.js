@@ -686,7 +686,23 @@ async function manageMegaGroups(req, res, next) {
   }
 }
 
+
+async function tempZeroPoints(req, res, next) {
+  try {
+    await pool.query('UPDATE students SET knowledge_points = 0, attendance_points = 0, cultural_points = 0, sports_points = 0');
+    await pool.query('UPDATE mega_groups SET cultural_points = 0, sports_points = 0, audience_points = 0');
+    await pool.query('DELETE FROM attendance');
+    await pool.query('DELETE FROM self_achievements');
+    await pool.query('DELETE FROM initiatives');
+    await pool.query('DELETE FROM weekly_points_archive');
+    res.send('POINTS ZEROED ON SERVER DATABASE');
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
+  tempZeroPoints,
   manageMegaGroups,
   tempResetDatabase,
   updateAttendanceSetting,
