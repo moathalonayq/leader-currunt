@@ -73,6 +73,13 @@ const pool = require("./config/db");
   }
 
   try {
+    try {
+      await pool.query('ALTER TABLE settings MODIFY COLUMN `value` LONGTEXT');
+      console.log('Migrated settings.value to LONGTEXT');
+    } catch (err) {
+      console.log('LONGTEXT migration skipped or already done:', err.message);
+    }
+
     const requiredDates = ["2026-09-03", "2026-09-10", "2026-09-17", "2026-09-24", "2026-09-28", "2026-10-01", "2026-10-08", "2026-10-12", "2026-10-15", "2026-10-22", "2026-10-26", "2026-10-29", "2026-11-05", "2026-11-09", "2026-11-12", "2026-11-19", "2026-11-26", "2026-11-30", "2026-12-03", "2026-12-10", "2026-12-14", "2026-12-17", "2026-12-24"];
 
     // Find old sessions
