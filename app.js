@@ -26,6 +26,12 @@ const PORT = process.env.PORT || 3000;
 const pool = require("./config/db");
 (async () => {
   try {
+
+    try {
+      await pool.query('ALTER TABLE students ADD COLUMN mega_group_id INT DEFAULT NULL');
+      console.log('Added mega_group_id to students');
+    } catch(err) {}
+
     await pool.query("ALTER TABLE students ADD COLUMN cultural_points INT DEFAULT 0, ADD COLUMN sports_points INT DEFAULT 0");
     console.log("Auto-migration: Added cultural/sports points columns");
   } catch (err) {

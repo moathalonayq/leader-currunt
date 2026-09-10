@@ -30,12 +30,15 @@ const addPointsToMegaGroup = async (groupId, axis, points) => {
 };
 
 
+const assignStudentToMegaGroup = async (studentId, megaGroupId) => {
+  await pool.query("UPDATE students SET mega_group_id = ? WHERE id = ?", [megaGroupId || null, studentId]);
+};
+
 const assignGroupToMegaGroup = async (groupId, megaGroupId) => {
   await pool.query("UPDATE \`groups\` SET mega_group_id = ? WHERE id = ?", [megaGroupId || null, groupId]);
 };
 
 const getMegaGroupDetails = async () => {
-  // Get all mega groups
   const [mgs] = await pool.query(`
     SELECT 
       id, name, cultural_points, sports_points, audience_points,
@@ -43,23 +46,26 @@ const getMegaGroupDetails = async () => {
     FROM mega_groups
     ORDER BY total_points DESC, name ASC
   `);
-
-  // Get all groups with their mega_group_id
-  const [groups] = await pool.query("SELECT id, name, mega_group_id FROM \`groups\` WHERE mega_group_id IS NOT NULL");
-
-  // Get all students
-  const [students] = await pool.query("SELECT id, name, group_id FROM students");
+  
+  const [students] = await pool.query("SELECT id, name, group_id, mega_group_id FROM students WHERE mega_group_id IS NOT NULL");
+  const [groups] = await pool.query("SELECT id, name FROM `groups`");
 
   for (const mg of mgs) {
-    mg.usras = groups.filter(g => g.mega_group_id == mg.id).map(g => {
+    const mgStudents = students.filter(s => s.mega_group_id == mg.id);
+    const grouped = {};
+    for (const s of mgStudents) {
+      if (!grouped[s.group_id]) grouped[s.group_id] = [];
+      grouped[s.group_id].push(s);
+    }
+    mg.usras = Object.keys(grouped).map(gid => {
+      const g = groups.find(x => x.id == gid);
       return {
-        id: g.id,
-        name: g.name,
-        students: students.filter(s => s.group_id == g.id)
+        id: gid,
+        name: g ? g.name : 'أخرى',
+        students: grouped[gid]
       };
     });
   }
-
   return mgs;
 };
 
@@ -81,6 +87,7 @@ module.exports = {
   deleteMegaGroup,
   renameMegaGroup,
   assignGroupToMegaGroup,
+  assignStudentToMegaGroup,
   getMegaGroupDetails,
   getAllMegaGroups,
   addPointsToMegaGroup

@@ -8,28 +8,50 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   const assignMegaGroupForm = document.getElementById("assignMegaGroupForm");
+  const assignGroupIdFilter = document.getElementById("assignGroupIdFilter");
+  const assignStudentId = document.getElementById("assignStudentId");
+  
+  if (assignGroupIdFilter && assignStudentId) {
+    const dataEl = document.getElementById("attendanceGroupsDataJson");
+    if (dataEl) {
+      const allG = JSON.parse(dataEl.textContent);
+      assignGroupIdFilter.addEventListener("change", () => {
+        const gId = assignGroupIdFilter.value;
+        const group = allG.find(x => x.id == gId);
+        assignStudentId.innerHTML = '<option value="" disabled selected>اختر الطالب</option>';
+        if (group && group.members) {
+           group.members.forEach(m => {
+              assignStudentId.innerHTML += `<option value="${m.id}">${m.name}</option>`;
+           });
+        }
+      });
+    }
+  }
+
   if (assignMegaGroupForm) {
     assignMegaGroupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const groupId = document.getElementById("assignGroupId").value;
+      const studentId = assignStudentId.value;
       const megaGroupId = document.getElementById("assignMegaGroupId").value;
-
-      const btn = document.getElementById("assignSubmitBtn");
-      const origText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = "جاري الحفظ...";
 
       try {
         const res = await fetch("/api/supervisor/mega-groups/assign", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ groupId, megaGroupId })
+          body: JSON.stringify({ studentId, megaGroupId }),
         });
         const data = await res.json();
         if (data.success) {
-          alert("تم حفظ الربط بنجاح!");
-          window.location.reload();
+          alert("تم تحديث ربط الطالب بنجاح");
         } else {
+          alert("حدث خطأ: " + (data.error || ""));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("خطأ في الاتصال");
+      }
+    });
+  } else {
           alert(data.error || "حدث خطأ");
         }
       } catch (err) {

@@ -774,6 +774,19 @@ module.exports.updateMegaGroupPoints = async (req, res) => {
 };
 module.exports.assignMegaGroup = async (req, res) => {
   try {
+    const { studentId, megaGroupId } = req.body;
+    if (!studentId) {
+      return res.status(400).json({ success: false, error: "Missing student id" });
+    }
+    const megaGroupModel = require('../models/megaGroupModel');
+    await megaGroupModel.assignStudentToMegaGroup(studentId, megaGroupId || null);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+// module.exports.assignMegaGroupOLD = async (req, res) => {
+  try {
     const { groupId, megaGroupId } = req.body;
     if (!groupId) {
       return res.status(400).json({ success: false, error: "Missing group id" });

@@ -284,17 +284,23 @@
         </table>
       </div>
 
-          <h4 style="margin-top:0;">🔗 ربط الأسر بالمجموعات الكبرى</h4>
+          <h4 style="margin-top:0;">🔗 ربط أسماء الطلاب بالمجموعات الكبرى</h4>
           <form id="assignMegaGroupForm">
             <div class="form-group">
-              <label>الأسرة</label>
-              <select id="assignGroupId" class="form-select" required>
+              <label>الأسرة (لتصفية الطلاب)</label>
+              <select id="assignGroupIdFilter" class="form-select">
                 <option value="" disabled selected>اختر الأسرة</option>
                 <% groups.forEach(g=> { %>
                   <option value="<%= g.id %>">
                     <%= g.name %>
                   </option>
                   <% }) %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>الطالب</label>
+              <select id="assignStudentId" class="form-select" required>
+                <option value="" disabled selected>اختر الطالب</option>
               </select>
             </div>
             <div class="form-group">
@@ -308,8 +314,7 @@
                   <% }) %>
               </select>
             </div>
-            <button type="submit" class="btn btn-outline" style="width:100%;" id="assignSubmitBtn">حفظ الربط</button>
-            <p class="form-msg" id="assignMsg"></p>
+            <button type="submit" class="btn btn-primary">حفظ الربط</button>
           </form>
           </div>
 
