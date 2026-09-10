@@ -1149,3 +1149,58 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const scheduleImageForm = document.getElementById('scheduleImageForm');
+  if (scheduleImageForm) {
+    scheduleImageForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('scheduleImageInput');
+      const msg = document.getElementById('scheduleImageMsg');
+      if (!fileInput.files || !fileInput.files[0]) {
+         msg.textContent = 'الرجاء اختيار صورة أولاً';
+         msg.className = 'form-msg error';
+         return;
+      }
+      
+      const file = fileInput.files[0];
+      if (file.size > 2 * 1024 * 1024) {
+         msg.textContent = 'حجم الصورة كبير جداً، الحد الأقصى 2 ميجابايت';
+         msg.className = 'form-msg error';
+         return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async function(event) {
+         const base64Str = event.target.result;
+         try {
+            document.getElementById('scheduleImageBtn').disabled = true;
+            msg.textContent = 'جاري الرفع...';
+            msg.className = 'form-msg';
+
+            const res = await fetch('/api/supervisor/schedule-image', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ image: base64Str })
+            });
+            const data = await res.json();
+            if (data.success) {
+               msg.textContent = 'تم تحديث صورة الجدول بنجاح';
+               msg.className = 'form-msg success';
+            } else {
+               msg.textContent = data.message || 'حدث خطأ';
+               msg.className = 'form-msg error';
+            }
+         } catch(err) {
+            msg.textContent = 'حدث خطأ في الاتصال';
+            msg.className = 'form-msg error';
+         } finally {
+            document.getElementById('scheduleImageBtn').disabled = false;
+         }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+});
+  

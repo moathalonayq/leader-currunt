@@ -705,7 +705,20 @@ async function tempZeroPoints(req, res, next) {
   }
 }
 
+
+async function updateScheduleImage(req, res, next) {
+  try {
+    const { image } = req.body;
+    await pool.query("DELETE FROM settings WHERE `key` = 'schedule_image'");
+    await pool.query("INSERT INTO settings (`key`, value) VALUES ('schedule_image', ?)", [image]);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
+  updateScheduleImage,
   tempZeroPoints,
   manageMegaGroups,
   tempResetDatabase,

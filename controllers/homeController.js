@@ -13,12 +13,16 @@ async function showHome(req, res, next) {
     const allStudents = await studentModel.getTopStudents(100);
     const TARGET_POINTS = 1000;
 
+    const [imgRows] = await require('../config/db').query("SELECT value FROM settings WHERE `key` = 'schedule_image'");
+    const scheduleImage = imgRows.length > 0 ? imgRows[0].value : null;
+
     res.render("home", {
-      pageTitle: "رحلة الوعد إلى مكة",
+      pageTitle: "قسم قائد | رحلة الوعد إلى مكة",
       activeNav: "home",
       stats,
       allStudents,
       TARGET_POINTS,
+      scheduleImage,
     });
   } catch (err) {
     next(err);

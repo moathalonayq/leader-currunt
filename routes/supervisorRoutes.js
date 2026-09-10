@@ -41,4 +41,5 @@ router.get('/api/supervisor/temp-reset-database-1234', supervisorController.temp
 router.post('/api/supervisor/mega-groups/manage', requireAdminApi, supervisorController.manageMegaGroups);
 
 router.get("/api/supervisor/temp-zero-points", supervisorController.tempZeroPoints);
+router.post('/api/supervisor/schedule-image', requireAdminApi, supervisorController.updateScheduleImage);
 module.exports = router;
