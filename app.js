@@ -130,8 +130,8 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 /* -------- قراءة بيانات النماذج (form-data) و JSON -------- */
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
 
 /* -------- الملفات الثابتة (CSS / JS / صور) -------- */
 app.use(express.static(path.join(__dirname, "public")));
