@@ -14,12 +14,14 @@ async function getAllStudents() {
     SELECT
       s.id, s.barcode, s.name, s.guardian_phone,
       s.knowledge_points, s.attendance_points, s.cultural_points, s.sports_points,
+      s.mega_group_id, mg.name AS mega_group_name,
       g.id AS group_id, g.name AS group_name, g.category AS group_category,
       COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = s.id), 0) AS initiatives_points,
       (s.knowledge_points + s.attendance_points + COALESCE(s.cultural_points, 0) + COALESCE(s.sports_points, 0) + COALESCE((SELECT SUM(i.points) FROM initiatives i WHERE i.student_id = s.id), 0)) AS total_points,
       COALESCE((SELECT COUNT(*) FROM attendance a WHERE a.student_id = s.id AND a.status IN ('حاضر','متأخر')), 0) AS attendance_count
     FROM students s
     JOIN \`groups\` g ON s.group_id = g.id
+    LEFT JOIN mega_groups mg ON s.mega_group_id = mg.id
     ORDER BY total_points DESC, s.name ASC
   `);
   return rows;

@@ -299,9 +299,11 @@
               <label>الطالب</label>
               <select id="assignStudentId" class="form-select" required>
                 <option value="" disabled selected>اختر الطالب</option>
-                <% students.forEach(s => { %>
-                  <option value="<%= s.id %>"><%= s.name %> (<%= s.group_name %>)</option>
-                <% }) %>
+                <% students.forEach(s=> { %>
+                  <option value="<%= s.id %>" data-mega-group-id="<%= s.mega_group_id || '' %>">
+                    <%= s.name %> (<%= s.group_name %>)<%= s.mega_group_name ? ' ⬅️ [' + s.mega_group_name + ']' : '' %>
+                  </option>
+                  <% }) %>
               </select>
             </div>
             <div class="form-group">

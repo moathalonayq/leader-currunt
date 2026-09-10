@@ -9,12 +9,21 @@
 document.addEventListener("DOMContentLoaded", () => {
   const assignMegaGroupForm = document.getElementById("assignMegaGroupForm");
   const assignStudentId = document.getElementById("assignStudentId");
+  const assignMegaGroupId = document.getElementById("assignMegaGroupId");
+
+  if (assignStudentId && assignMegaGroupId) {
+    assignStudentId.addEventListener("change", () => {
+      const selectedOption = assignStudentId.options[assignStudentId.selectedIndex];
+      const currentMgId = selectedOption.getAttribute("data-mega-group-id");
+      assignMegaGroupId.value = currentMgId || "";
+    });
+  }
 
   if (assignMegaGroupForm) {
     assignMegaGroupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const studentId = assignStudentId.value;
-      const megaGroupId = document.getElementById("assignMegaGroupId").value;
+      const megaGroupId = assignMegaGroupId.value;
 
       try {
         const res = await fetch("/api/supervisor/mega-groups/assign", {
@@ -25,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await res.json();
         if (data.success) {
           alert("تم تحديث ربط الطالب بنجاح");
+          window.location.reload();
         } else {
           alert("حدث خطأ: " + (data.error || ""));
         }
@@ -32,16 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error(err);
         alert("خطأ في الاتصال");
       }
-    });
-  } else {
-    alert(data.error || "حدث خطأ");
-  }
-} catch (err) {
-  alert("خطأ في الاتصال");
-} finally {
-  btn.disabled = false;
-  btn.textContent = origText;
-}
     });
   }
 
