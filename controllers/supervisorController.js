@@ -135,7 +135,7 @@ async function showPanel(req, res, next) {
     const groupsMap = {};
     students.forEach((s) => {
       if (!groupsMap[s.group_name]) {
-        groupsMap[s.group_name] = { groupName: s.group_name, members: [] };
+        groupsMap[s.group_name] = { groupId: s.group_id, groupName: s.group_name, members: [] };
       }
       groupsMap[s.group_name].members.push({
         id: s.id,

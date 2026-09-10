@@ -10,19 +10,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const assignMegaGroupForm = document.getElementById("assignMegaGroupForm");
   const assignGroupIdFilter = document.getElementById("assignGroupIdFilter");
   const assignStudentId = document.getElementById("assignStudentId");
-  
+
   if (assignGroupIdFilter && assignStudentId) {
     const dataEl = document.getElementById("attendanceGroupsDataJson");
     if (dataEl) {
       const allG = JSON.parse(dataEl.textContent);
       assignGroupIdFilter.addEventListener("change", () => {
         const gId = assignGroupIdFilter.value;
-        const group = allG.find(x => x.groupName == gId);
+        const group = allG.find(x => x.groupId == gId);
         assignStudentId.innerHTML = '<option value="" disabled selected>اختر الطالب</option>';
         if (group && group.members) {
-           group.members.forEach(m => {
-              assignStudentId.innerHTML += `<option value="${m.id}">${m.name}</option>`;
-           });
+          group.members.forEach(m => {
+            assignStudentId.innerHTML += `<option value="${m.id}">${m.name}</option>`;
+          });
         }
       });
     }
@@ -52,63 +52,63 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   } else {
-          alert(data.error || "حدث خطأ");
-        }
-      } catch (err) {
-        alert("خطأ في الاتصال");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = origText;
-      }
+    alert(data.error || "حدث خطأ");
+  }
+} catch (err) {
+  alert("خطأ في الاتصال");
+} finally {
+  btn.disabled = false;
+  btn.textContent = origText;
+}
     });
   }
 
-  const megaGroupForm = document.getElementById("megaGroupForm");
-  if (megaGroupForm) {
-    megaGroupForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const groupId = document.getElementById("megaGroupId").value;
-      const axis = document.getElementById("megaGroupAxis").value;
-      const points = document.getElementById("megaGroupPoints").value;
+const megaGroupForm = document.getElementById("megaGroupForm");
+if (megaGroupForm) {
+  megaGroupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const groupId = document.getElementById("megaGroupId").value;
+    const axis = document.getElementById("megaGroupAxis").value;
+    const points = document.getElementById("megaGroupPoints").value;
 
-      const btn = document.getElementById("megaGroupSubmitBtn");
-      const origText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = "جاري التحديث...";
+    const btn = document.getElementById("megaGroupSubmitBtn");
+    const origText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "جاري التحديث...";
 
-      try {
-        const res = await fetch("/supervisor/api/supervisor/mega-groups/points", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ groupId, axis, points })
-        });
-        const data = await res.json();
-        if (data.success) {
-          alert("تم تحديث الكيلوات بنجاح!");
-          window.location.reload();
-        } else {
-          alert(data.error || "حدث خطأ");
-        }
-      } catch (err) {
-        alert("خطأ في الاتصال");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = origText;
+    try {
+      const res = await fetch("/supervisor/api/supervisor/mega-groups/points", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groupId, axis, points })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("تم تحديث الكيلوات بنجاح!");
+        window.location.reload();
+      } else {
+        alert(data.error || "حدث خطأ");
       }
-    });
-  }
+    } catch (err) {
+      alert("خطأ في الاتصال");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = origText;
+    }
+  });
+}
 
-  setupStudentSearchSelects();
-  setupPointsForm();
-  setupCatPointsForm();
-  setupKnowledgeTasksPanel();
-  setupBarcodeModal();
-  setupGlobalToggleScores();
-  setupAttendanceListByFamily();
-  setupAddStudentForm();
-  setupDeleteStudentForm();
-  setupMoveStudentForm();
-  setupPhoneInputs();
+setupStudentSearchSelects();
+setupPointsForm();
+setupCatPointsForm();
+setupKnowledgeTasksPanel();
+setupBarcodeModal();
+setupGlobalToggleScores();
+setupAttendanceListByFamily();
+setupAddStudentForm();
+setupDeleteStudentForm();
+setupMoveStudentForm();
+setupPhoneInputs();
 });
 
 /* =========================================================
@@ -328,7 +328,7 @@ function setupAttendanceListByFamily() {
     refreshAttendanceButtonStates(sessionSelect);
   };
 
-  
+
   // Mark all present button
   const markAllPresentBtn = document.getElementById('markAllPresentBtn');
   if (markAllPresentBtn) {
@@ -337,32 +337,32 @@ function setupAttendanceListByFamily() {
       const sessionId = sessionSelect.value;
       if (typeof window.currentGroupIndex === 'undefined') return;
       const group = allGroups[window.currentGroupIndex];
-      
+
       markAllPresentBtn.disabled = true;
       markAllPresentBtn.textContent = 'جاري التحضير...';
 
       try {
         for (const m of group.members) {
-           if (m.attendance && m.attendance[sessionId] === 'حاضر') continue;
+          if (m.attendance && m.attendance[sessionId] === 'حاضر') continue;
 
-           const res = await fetch("/api/supervisor/attendance", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ studentId: m.id, sessionId, status: "حاضر" }),
-           });
-           const data = await res.json();
-           if (data.success) {
-              m.attendance = m.attendance || {};
-              m.attendance[sessionId] = 'حاضر';
-              
-              const row = document.querySelector(`.attendance-row[data-student-id="${m.id}"]`);
-              if (row) {
-                 row.dataset.attendance = JSON.stringify(m.attendance);
-                 row.querySelectorAll(".att-btn").forEach((b) => {
-                   b.classList.toggle("active", b.dataset.status === "حاضر");
-                 });
-              }
-           }
+          const res = await fetch("/api/supervisor/attendance", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ studentId: m.id, sessionId, status: "حاضر" }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            m.attendance = m.attendance || {};
+            m.attendance[sessionId] = 'حاضر';
+
+            const row = document.querySelector(`.attendance-row[data-student-id="${m.id}"]`);
+            if (row) {
+              row.dataset.attendance = JSON.stringify(m.attendance);
+              row.querySelectorAll(".att-btn").forEach((b) => {
+                b.classList.toggle("active", b.dataset.status === "حاضر");
+              });
+            }
+          }
         }
       } catch (err) {
         alert('حدث خطأ أثناء تحضير الجميع');
@@ -1122,7 +1122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         alert(data.message);
         if (data.success) location.reload();
-      } catch(err) {
+      } catch (err) {
         alert('حدث خطأ في الاتصال');
       }
     });
@@ -1143,7 +1143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         alert(data.message);
         if (data.success) location.reload();
-      } catch(err) {
+      } catch (err) {
         alert('حدث خطأ في الاتصال');
       }
     });
@@ -1155,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const id = btn.dataset.id;
       const name = btn.dataset.name;
       if (!confirm(`هل أنت متأكد من حذف المجموعة الكبرى "${name}"؟\nسيتم إزالة ربطها من جميع الأسر المرتبطة بها ولن تحذف الأسر نفسها.`)) return;
-      
+
       try {
         const res = await fetch('/api/supervisor/mega-groups/manage', {
           method: 'POST',
@@ -1165,7 +1165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         alert(data.message);
         if (data.success) location.reload();
-      } catch(err) {
+      } catch (err) {
         alert('حدث خطأ في الاتصال');
       }
     });
@@ -1181,48 +1181,47 @@ document.addEventListener('DOMContentLoaded', () => {
       const fileInput = document.getElementById('scheduleImageInput');
       const msg = document.getElementById('scheduleImageMsg');
       if (!fileInput.files || !fileInput.files[0]) {
-         msg.textContent = 'الرجاء اختيار صورة أولاً';
-         msg.className = 'form-msg error';
-         return;
+        msg.textContent = 'الرجاء اختيار صورة أولاً';
+        msg.className = 'form-msg error';
+        return;
       }
-      
+
       const file = fileInput.files[0];
       if (file.size > 2 * 1024 * 1024) {
-         msg.textContent = 'حجم الصورة كبير جداً، الحد الأقصى 2 ميجابايت';
-         msg.className = 'form-msg error';
-         return;
+        msg.textContent = 'حجم الصورة كبير جداً، الحد الأقصى 2 ميجابايت';
+        msg.className = 'form-msg error';
+        return;
       }
 
       const reader = new FileReader();
-      reader.onload = async function(event) {
-         const base64Str = event.target.result;
-         try {
-            document.getElementById('scheduleImageBtn').disabled = true;
-            msg.textContent = 'جاري الرفع...';
-            msg.className = 'form-msg';
+      reader.onload = async function (event) {
+        const base64Str = event.target.result;
+        try {
+          document.getElementById('scheduleImageBtn').disabled = true;
+          msg.textContent = 'جاري الرفع...';
+          msg.className = 'form-msg';
 
-            const res = await fetch('/api/supervisor/schedule-image', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({ image: base64Str })
-            });
-            const data = await res.json();
-            if (data.success) {
-               msg.textContent = 'تم تحديث صورة الجدول بنجاح';
-               msg.className = 'form-msg success';
-            } else {
-               msg.textContent = data.message || 'حدث خطأ';
-               msg.className = 'form-msg error';
-            }
-         } catch(err) {
-            msg.textContent = 'حدث خطأ في الاتصال';
+          const res = await fetch('/api/supervisor/schedule-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Str })
+          });
+          const data = await res.json();
+          if (data.success) {
+            msg.textContent = 'تم تحديث صورة الجدول بنجاح';
+            msg.className = 'form-msg success';
+          } else {
+            msg.textContent = data.message || 'حدث خطأ';
             msg.className = 'form-msg error';
-         } finally {
-            document.getElementById('scheduleImageBtn').disabled = false;
-         }
+          }
+        } catch (err) {
+          msg.textContent = 'حدث خطأ في الاتصال';
+          msg.className = 'form-msg error';
+        } finally {
+          document.getElementById('scheduleImageBtn').disabled = false;
+        }
       };
       reader.readAsDataURL(file);
     });
   }
 });
-  
