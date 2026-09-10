@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const allG = JSON.parse(dataEl.textContent);
       assignGroupIdFilter.addEventListener("change", () => {
         const gId = assignGroupIdFilter.value;
-        const group = allG.find(x => x.id == gId);
+        const group = allG.find(x => x.groupName == gId);
         assignStudentId.innerHTML = '<option value="" disabled selected>اختر الطالب</option>';
         if (group && group.members) {
            group.members.forEach(m => {

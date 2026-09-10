@@ -291,7 +291,7 @@
               <select id="assignGroupIdFilter" class="form-select">
                 <option value="" disabled selected>اختر الأسرة</option>
                 <% groups.forEach(g=> { %>
-                  <option value="<%= g.id %>">
+                  <option value="<%= g.name %>">
                     <%= g.name %>
                   </option>
                   <% }) %>
