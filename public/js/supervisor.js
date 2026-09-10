@@ -8,25 +8,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   const assignMegaGroupForm = document.getElementById("assignMegaGroupForm");
-  const assignGroupIdFilter = document.getElementById("assignGroupIdFilter");
   const assignStudentId = document.getElementById("assignStudentId");
-
-  if (assignGroupIdFilter && assignStudentId) {
-    const dataEl = document.getElementById("attendanceGroupsDataJson");
-    if (dataEl) {
-      const allG = JSON.parse(dataEl.textContent);
-      assignGroupIdFilter.addEventListener("change", () => {
-        const gId = assignGroupIdFilter.value;
-        const group = allG.find(x => x.groupId == gId);
-        assignStudentId.innerHTML = '<option value="" disabled selected>اختر الطالب</option>';
-        if (group && group.members) {
-          group.members.forEach(m => {
-            assignStudentId.innerHTML += `<option value="${m.id}">${m.name}</option>`;
-          });
-        }
-      });
-    }
-  }
 
   if (assignMegaGroupForm) {
     assignMegaGroupForm.addEventListener("submit", async (e) => {

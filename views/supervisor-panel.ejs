@@ -296,20 +296,12 @@
           <h4 style="margin-top:0;">🔗 ربط أسماء الطلاب بالمجموعات الكبرى</h4>
           <form id="assignMegaGroupForm">
             <div class="form-group">
-              <label>الأسرة (لتصفية الطلاب)</label>
-              <select id="assignGroupIdFilter" class="form-select">
-                <option value="" disabled selected>اختر الأسرة</option>
-                <% groups.forEach(g=> { %>
-                  <option value="<%= g.id %>">
-                    <%= g.name %>
-                  </option>
-                  <% }) %>
-              </select>
-            </div>
-            <div class="form-group">
               <label>الطالب</label>
               <select id="assignStudentId" class="form-select" required>
                 <option value="" disabled selected>اختر الطالب</option>
+                <% students.forEach(s => { %>
+                  <option value="<%= s.id %>"><%= s.name %> (<%= s.group_name %>)</option>
+                <% }) %>
               </select>
             </div>
             <div class="form-group">
