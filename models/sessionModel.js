@@ -24,6 +24,10 @@ async function getSessionById(sessionId) {
   return rows[0] || null;
 }
 
+function getRiyadhDateStr() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh" }).format(new Date());
+}
+
 /**
  * يحدّد "جلسة اليوم" المناسبة لتسجيل الحضور التلقائي عبر الباركود:
  * 1) إن كان تاريخ اليوم نفسه يطابق إحدى الجلسات التسع بالضبط -> نرجعها
@@ -32,7 +36,7 @@ async function getSessionById(sessionId) {
  * هذا يضمن أن المسح بالكاميرا يسجّل دائماً لجلسة منطقية حتى خارج أيام النادي تماماً
  */
 async function getCurrentOrNextSession() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getRiyadhDateStr();
 
   const [exact] = await pool.query(
     "SELECT id, session_date, day_name, week_number FROM sessions WHERE session_date = ?",
@@ -59,17 +63,18 @@ async function getCurrentOrNextSession() {
  * تُستدعى عند عرض صفحات الحضور حتى يبقى السجل محدَّثاً دون الحاجة لمهمة مجدولة (cron).
  */
 async function autoMarkAbsentForPastSessions() {
+  const today = getRiyadhDateStr();
   await pool.query(`
     INSERT INTO attendance (student_id, session_id, status)
     SELECT s.id, sess.id, 'غايب'
     FROM students s
     CROSS JOIN sessions sess
-    WHERE sess.session_date < CURDATE()
+    WHERE sess.session_date < ?
       AND NOT EXISTS (
         SELECT 1 FROM attendance a
         WHERE a.student_id = s.id AND a.session_id = sess.id
       )
-  `);
+  `, [today]);
 }
 
 /**
@@ -77,7 +82,7 @@ async function autoMarkAbsentForPastSessions() {
  * الطالب لنفسه، الذي يجب أن يعمل فقط في يوم الجلسة الفعلي لا أي يوم آخر
  */
 async function getTodaySession() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getRiyadhDateStr();
   const [rows] = await pool.query(
     "SELECT id, session_date, day_name, week_number FROM sessions WHERE session_date = ?",
     [today]
