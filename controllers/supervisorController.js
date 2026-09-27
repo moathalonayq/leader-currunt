@@ -745,7 +745,54 @@ module.exports = {
   showWeeklyReminders,
   sendWeeklyReminder,
   sendAllWeeklyReminders,
+  addDirectPoints,
 };
+
+async function addDirectPoints(req, res, next) {
+  try {
+    const { studentId, amount, target, reason, mode } = req.body;
+    const studentIdNum = Number(studentId);
+    let amountNum = Number(amount);
+
+    if (!studentIdNum || !amountNum || isNaN(amountNum) || amountNum <= 0) {
+      return res.status(400).json({ success: false, message: "أدخل بيانات صحيحة وعدد كيلوات أكبر من صفر" });
+    }
+
+    if (mode === "subtract") amountNum = -amountNum;
+
+    const program = target === "initiative" ? "initiative" : "knowledge";
+    const category = (reason || "تعويض / بدون مقابل").trim();
+
+    if (program === "initiative") {
+      await pool.query(
+        "INSERT INTO initiatives (student_id, category, points) VALUES (?, ?, ?)",
+        [studentIdNum, category, amountNum]
+      );
+    } else {
+      await pool.query(
+        "UPDATE students SET knowledge_points = GREATEST(knowledge_points + ?, 0) WHERE id = ?",
+        [amountNum, studentIdNum]
+      );
+    }
+
+    const [studentRows] = await pool.query("SELECT name FROM students WHERE id = ?", [studentIdNum]);
+    const studentName = studentRows[0] ? studentRows[0].name : `#${studentIdNum}`;
+    const actionLabel = mode === "subtract" ? "خصم" : "إضافة";
+    const targetLabel = program === "knowledge" ? "البرنامج الذاتي (تعويض)" : `مبادرة (${category})`;
+
+    await pool.query(
+      "INSERT INTO activity_log (action) VALUES (?)",
+      [`${actionLabel} كيلوات مباشرة (${Math.abs(amountNum)} كيلو) للطالب ${studentName} في ${targetLabel}`]
+    );
+
+    res.json({
+      success: true,
+      message: `تمت ${actionLabel} ${Math.abs(amountNum)} كيلو بنجاح للطالب ${studentName}`,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
 
 
 async function updateCategoryPoints(req, res, next) {

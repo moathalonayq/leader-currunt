@@ -23,6 +23,7 @@ router.post("/api/supervisor/students/phone", requireAdminApi, supervisorControl
 router.post("/api/supervisor/weekly-reminders/send", requireAdminApi, supervisorController.sendWeeklyReminder);
 router.post("/api/supervisor/weekly-reminders/send-all", requireAdminApi, supervisorController.sendAllWeeklyReminders);
 router.post("/api/supervisor/points", requireSupervisorApi, supervisorController.addPoints);
+router.post("/api/supervisor/direct-points", requireSupervisorApi, supervisorController.addDirectPoints);
 router.post("/api/supervisor/attendance", requireSupervisorApi, supervisorController.markAttendanceManual);
 router.post("/api/supervisor/self-achievements", requireAdminApi, supervisorController.setSelfAchievementStatus);
 router.get("/api/supervisor/self-task-config", requireAdminApi, supervisorController.getSelfTaskConfig);

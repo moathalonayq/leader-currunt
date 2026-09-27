@@ -82,6 +82,7 @@ if (megaGroupForm) {
 
 setupStudentSearchSelects();
 setupPointsForm();
+setupDirectPointsForm();
 setupCatPointsForm();
 setupKnowledgeTasksPanel();
 setupBarcodeModal();
@@ -500,7 +501,7 @@ function setupStudentSearchSelects() {
   setupStudentSearchSelect("moveStudentSearch", "moveStudentResults", "moveStudentSelect", students);
 
   setupGroupStudentPicker("initiativeGroupPicker", "initiativeStudentPicker", "initiativeStudentSelect", students);
-  setupGroupStudentPicker("catPointsGroupPicker", "catPointsStudentPicker", "catPointsStudentSelect", students);
+  setupGroupStudentPicker("directGroupPicker", "directStudentPicker", "directStudentSelect", students);
   setupGroupStudentPicker("catPointsGroupPicker", "catPointsStudentPicker", "catPointsStudentSelect", students);
   setupGroupStudentPicker("tasksGroupPicker", "tasksStudentPicker", "tasksStudentSelect", students, (id) => {
     loadKnowledgeTasks(id);
@@ -741,6 +742,69 @@ function setupPointsForm() {
       updateStudentRowInTable(data.student);
     } catch (err) {
       showMsg(msg, "حدث خطأ في الاتصال بالخادم", "error");
+    }
+  }
+}
+
+/* =========================================================
+   إضافة كيلوات مباشرة / تعويض (بدون مقابل)
+   ========================================================= */
+function setupDirectPointsForm() {
+  const addBtn = document.getElementById("addDirectPointsBtn");
+  const subtractBtn = document.getElementById("subtractDirectPointsBtn");
+  const msg = document.getElementById("directPointsMsg");
+  if (!addBtn || !subtractBtn) return;
+
+  addBtn.addEventListener("click", () => submitDirectPoints("add"));
+  subtractBtn.addEventListener("click", () => submitDirectPoints("subtract"));
+
+  async function submitDirectPoints(mode) {
+    const studentId = document.getElementById("directStudentSelect").value;
+    const target = document.getElementById("directPointsTarget").value;
+    const amountInput = document.getElementById("directPointsAmount");
+    const reasonInput = document.getElementById("directPointsReason");
+    const amount = Number(amountInput.value);
+    const reason = (reasonInput.value || "").trim();
+    const studentName = document.getElementById("directStudentSelect").dataset.name || "الطالب";
+
+    if (!studentId) {
+      showMsg(msg, "اختر طالباً أولاً", "error");
+      return;
+    }
+    if (!amount || isNaN(amount) || amount <= 0) {
+      showMsg(msg, "أدخل عدد كيلوات صحيح أكبر من صفر", "error");
+      return;
+    }
+
+    const actionLabel = mode === "subtract" ? "خصم" : "إضافة";
+    if (!confirm(`هل أنت متأكد من ${actionLabel} ${amount} كيلو لـ ${studentName}؟`)) {
+      return;
+    }
+
+    const activeBtn = mode === "subtract" ? subtractBtn : addBtn;
+    activeBtn.disabled = true;
+    const origText = activeBtn.textContent;
+    activeBtn.textContent = "جاري الحفظ...";
+
+    try {
+      const res = await fetch("/api/supervisor/direct-points", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId, target, amount, reason, mode }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg(msg, `✅ ${data.message}`, "success");
+        amountInput.value = "";
+        reasonInput.value = "";
+      } else {
+        showMsg(msg, data.message || "حدث خطأ أثناء حفظ الكيلوات", "error");
+      }
+    } catch (err) {
+      showMsg(msg, "حدث خطأ في الاتصال بالخادم", "error");
+    } finally {
+      activeBtn.disabled = false;
+      activeBtn.textContent = origText;
     }
   }
 }

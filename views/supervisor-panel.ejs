@@ -184,6 +184,46 @@
         <div id="knowledgeTasksList" class="knowledge-tasks-list scrollable-weeks"></div>
         <p class="form-msg" id="tasksMsg"></p>
       </div>
+
+      <!-- إضافة كيلوات مباشرة / تعويض (بدون مقابل) -->
+      <div class="panel-box">
+        <h4>🎁 إضافة كيلوات مباشرة / تعويض</h4>
+        <p class="section-desc" style="margin-bottom:12px; font-size:13px;">إضافة أو خصم كيلوات للطالب مباشرة بدون متطلب أسبوعي (لتعويض نسيان الرصد أو الإكراميات المباشرة).</p>
+        <form id="directPointsForm">
+          <input type="hidden" id="directStudentSelect">
+          <div class="form-group">
+            <label>اختر الطالب</label>
+            <div style="display:flex; gap:10px;">
+              <select id="directGroupPicker" class="form-select" style="flex:1;">
+                <option value="">اختر الأسرة</option>
+              </select>
+              <select id="directStudentPicker" class="form-select" style="flex:1;" disabled>
+                <option value="">اختر الطالب</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="directPointsTarget">جهة الكيلوات</label>
+            <select id="directPointsTarget" class="form-select">
+              <option value="knowledge" selected>📘 البرنامج الذاتي (تعويض متطلب)</option>
+              <option value="initiative">🌟 مبادرة / كيلوات إضافية عامة</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="directPointsAmount">عدد الكيلوات</label>
+            <input type="number" id="directPointsAmount" class="form-input" min="1" max="500" placeholder="أدخل عدد الكيلوات (مثال: 5، 10، 15...)">
+          </div>
+          <div class="form-group">
+            <label for="directPointsReason">السبب / الملاحظة (اختياري)</label>
+            <input type="text" id="directPointsReason" class="form-input" placeholder="مثال: تعويض نسيان رصد الذاتي للأسبوع الماضي">
+          </div>
+          <div class="form-group" style="display:flex; gap:10px;">
+            <button type="button" id="addDirectPointsBtn" class="btn btn-gold" style="flex:1;">➕ إضافة الكيلوات</button>
+            <button type="button" id="subtractDirectPointsBtn" class="btn btn-danger-outline" style="flex:1;">➖ خصم الكيلوات</button>
+          </div>
+          <p class="form-msg" id="directPointsMsg"></p>
+        </form>
+      </div>
     </div>
 
     <% if (role==='admin' ) { %>
