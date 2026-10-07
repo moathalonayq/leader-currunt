@@ -52,9 +52,7 @@ const pool = require("./config/db");
     `);
 
     const megaGroups = [
-      ["العطاء", 0, 0, 0],
-      ["البناء", 0, 0, 0],
-      ["الإخاء", 0, 0, 0]
+      // تم حذف مجموعات العطاء، البناء، الإخاء بناءً على طلب المستخدم
     ];
 
     for (const mg of megaGroups) {
