@@ -746,7 +746,87 @@ module.exports = {
   sendWeeklyReminder,
   sendAllWeeklyReminders,
   addDirectPoints,
+  exportStudentsCsv,
 };
+
+function csvEscape(field) {
+  if (field === null || field === undefined) return '""';
+  const str = String(field).replace(/"/g, '""');
+  return `"${str}"`;
+}
+
+async function exportStudentsCsv(req, res, next) {
+  try {
+    const students = await studentModel.getAllStudents();
+    const sessions = await sessionModel.getAllSessions();
+
+    const [attRows] = await pool.query("SELECT student_id, session_id, status FROM attendance");
+    const attendanceMap = {};
+    attRows.forEach(r => {
+      if (!attendanceMap[r.student_id]) attendanceMap[r.student_id] = {};
+      attendanceMap[r.student_id][r.session_id] = r.status;
+    });
+
+    const headers = [
+      "#",
+      "اسم الطالب",
+      "الأسرة",
+      "المجموعة الكبرى",
+      "نقاط الذاتي (المعرفي)",
+      "نقاط الحضور",
+      "مرات الحضور",
+      "المبادرات",
+      "الرياضي",
+      "الثقافي",
+      "إجمالي النقاط",
+      "رقم الجوال",
+      "الباركود",
+    ];
+
+    sessions.forEach(sess => {
+      headers.push(`أسبوع ${sess.week_number} - ${sess.day_name} (${sess.session_date})`);
+    });
+
+    const csvRows = [];
+    csvRows.push(headers.map(csvEscape).join(","));
+
+    students.forEach((s, idx) => {
+      const row = [
+        idx + 1,
+        s.name,
+        s.group_name || "",
+        s.mega_group_name || "",
+        s.knowledge_points || 0,
+        s.attendance_points || 0,
+        s.attendance_count || 0,
+        s.initiatives_points || 0,
+        s.sports_points || 0,
+        s.cultural_points || 0,
+        s.total_points || 0,
+        s.guardian_phone || "",
+        s.barcode || "",
+      ];
+
+      sessions.forEach(sess => {
+        const status = (attendanceMap[s.id] || {})[sess.id] || "—";
+        row.push(status);
+      });
+
+      csvRows.push(row.map(csvEscape).join(","));
+    });
+
+    // إضافة BOM (\uFEFF) حتى يتعرف Excel فوراً على ترميز UTF-8 باللغة العربية
+    const csvContent = "\uFEFF" + csvRows.join("\r\n");
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Riyadh" }).format(new Date());
+    const filename = `students_points_attendance_${today}.csv`;
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.send(csvContent);
+  } catch (err) {
+    next(err);
+  }
+}
 
 async function addDirectPoints(req, res, next) {
   try {

@@ -1271,3 +1271,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// تصدير كشف الطلاب والنقاط والحضور
+document.addEventListener('DOMContentLoaded', () => {
+  const exportBtn1 = document.getElementById('exportStudentsBtn');
+  const exportBtn2 = document.getElementById('exportStudentsBtnTable');
+
+  function handleExport() {
+    window.location.href = '/supervisor/export-students';
+  }
+
+  if (exportBtn1) exportBtn1.addEventListener('click', handleExport);
+  if (exportBtn2) exportBtn2.addEventListener('click', handleExport);
+});

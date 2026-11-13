@@ -8,6 +8,7 @@
         <a href="/daily-attendance" class="btn btn-outline btn-small">📋 التحضير اليومي</a>
         <a href="/supervisor/weekly-reminders" class="btn btn-gold btn-small">📤 تذكير نهاية الأسبوع</a>
         <a href="/supervisor/points-archive" class="btn btn-gold btn-small">🗄️ أرشيف الكيلوات</a>
+        <button type="button" id="exportStudentsBtn" class="btn btn-gold btn-small">📥 تصدير كشف الطلاب (Excel)</button>
         <form method="POST" action="/supervisor/logout">
           <button type="submit" class="btn btn-outline btn-small">تسجيل الخروج</button>
         </form>
@@ -462,7 +463,10 @@
             <!-- =========================================================
          5) جدول كل الطلاب + باركود كل طالب
          ========================================================= -->
-            <h3 class="panel-group-title">📊 جميع الطلاب</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:28px; margin-bottom:12px;">
+              <h3 class="panel-group-title" style="margin:0;">📊 جميع الطلاب</h3>
+              <button type="button" id="exportStudentsBtnTable" class="btn btn-gold btn-small">📥 تصدير كشف الطلاب (Excel / CSV)</button>
+            </div>
             <div class="data-table-wrapper">
               <table class="data-table" id="supervisorStudentTable">
                 <thead>

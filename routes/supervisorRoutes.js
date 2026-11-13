@@ -14,6 +14,7 @@ router.get("/supervisor/panel", requireSupervisorPage, supervisorController.show
 router.get("/supervisor/attendance-cards", requireSupervisorPage, supervisorController.showAttendanceCards);
 router.get("/supervisor/points-archive", requireSupervisorPage, supervisorController.showPointsArchive);
 router.get("/supervisor/weekly-reminders", requireSupervisorPage, supervisorController.showWeeklyReminders);
+router.get("/supervisor/export-students", requireSupervisorPage, supervisorController.exportStudentsCsv);
 
 /* -------- API (محمية بجلسة المشرف) -------- */
 router.post("/api/supervisor/students", requireAdminApi, supervisorController.addStudent);
