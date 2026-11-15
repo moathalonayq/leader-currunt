@@ -767,6 +767,21 @@ async function exportStudentsCsv(req, res, next) {
       attendanceMap[r.student_id][r.session_id] = r.status;
     });
 
+    // جلب قائمة متطلبات البرنامج الذاتي مرتبة أسبوعياً
+    const [tasks] = await pool.query(
+      "SELECT id, week_number, title, points FROM weekly_self_tasks ORDER BY week_number ASC, id ASC"
+    );
+
+    // جلب إنجازات الطلاب للذاتي
+    const [achRows] = await pool.query(
+      "SELECT student_id, task_id, points FROM self_achievements"
+    );
+    const achievementsMap = {};
+    achRows.forEach(r => {
+      if (!achievementsMap[r.student_id]) achievementsMap[r.student_id] = {};
+      achievementsMap[r.student_id][r.task_id] = r.points;
+    });
+
     const headers = [
       "#",
       "اسم الطالب",
@@ -783,8 +798,14 @@ async function exportStudentsCsv(req, res, next) {
       "الباركود",
     ];
 
+    // إضافة أعمدة متطلبات البرنامج الذاتي
+    tasks.forEach(t => {
+      headers.push(`ذاتي: أسبوع ${t.week_number} - ${t.title} (${t.points} نقطة)`);
+    });
+
+    // إضافة أعمدة جلسات الحضور
     sessions.forEach(sess => {
-      headers.push(`أسبوع ${sess.week_number} - ${sess.day_name} (${sess.session_date})`);
+      headers.push(`حضور: أسبوع ${sess.week_number} - ${sess.day_name} (${sess.session_date})`);
     });
 
     const csvRows = [];
@@ -807,6 +828,13 @@ async function exportStudentsCsv(req, res, next) {
         s.barcode || "",
       ];
 
+      // قيم إنجاز الذاتي لكل متطلب
+      tasks.forEach(t => {
+        const earned = (achievementsMap[s.id] || {})[t.id];
+        row.push(earned !== undefined ? `منجز (${earned})` : "غير منجز");
+      });
+
+      // قيم الحضور لكل جلسة
       sessions.forEach(sess => {
         const status = (attendanceMap[s.id] || {})[sess.id] || "—";
         row.push(status);
